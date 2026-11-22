@@ -1,5 +1,5 @@
 ---
-title: "GPU kernel 的形式化验证，对软件栈测试意味着什么"
+title: "GPU kernel 的形式化验证对软件栈测试的启发"
 date: "2026-11-22"
 description: "从 Daniel Lemire 的帖子和 TensorLean 论文出发，解释 PTX 级形式化验证能补上测试的哪一层，以及如何落到 AI 软件栈验证。"
 tags:
