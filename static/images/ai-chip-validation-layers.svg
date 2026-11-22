@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-labelledby="title desc">
+  <title id="title">AI 芯片应用层验证的五个层次</title>
+  <desc id="desc">从底层的算子与数值，到模型正确性、单机与系统性能、集群与服务，最后到客户验收。</desc>
+  <rect width="480" height="320" fill="#f8f7f4"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#202326">
+    <text x="20" y="30" font-size="20" font-weight="700">验证不是只跑一个跑分</text>
+    <text x="20" y="51" font-size="14" fill="#6a6e72">越往上，越接近客户真实 workload</text>
+
+    <rect x="150" y="68" width="180" height="38" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="150" y="68" width="5" height="38" rx="2.5" fill="#2f5d60"/>
+    <text x="240" y="92" font-size="14" text-anchor="middle">客户验收</text>
+
+    <rect x="120" y="116" width="240" height="38" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="120" y="116" width="5" height="38" rx="2.5" fill="#7faaa7"/>
+    <text x="240" y="140" font-size="14" text-anchor="middle">集群与服务</text>
+
+    <rect x="90" y="164" width="300" height="38" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="90" y="164" width="5" height="38" rx="2.5" fill="#b3c2bf"/>
+    <text x="240" y="188" font-size="14" text-anchor="middle">单机与系统性能</text>
+
+    <rect x="60" y="212" width="360" height="38" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="60" y="212" width="5" height="38" rx="2.5" fill="#ccc6ba"/>
+    <text x="240" y="236" font-size="14" text-anchor="middle">模型正确性</text>
+
+    <rect x="30" y="260" width="420" height="38" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="30" y="260" width="5" height="38" rx="2.5" fill="#e4e1d9"/>
+    <text x="240" y="284" font-size="14" text-anchor="middle">算子与数值：覆盖、容差、特殊值</text>
+
+    <text x="20" y="316" font-size="12" fill="#6a6e72">越往下越基础，越往上越接近客户</text>
+  </g>
+</svg>
