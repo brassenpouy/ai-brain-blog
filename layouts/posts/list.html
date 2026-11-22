@@ -26,7 +26,7 @@
       <p>{{ .Summary | plainify | htmlUnescape | truncate 140 }}</p>
       {{ end }}
       <div class="home-entry-meta">
-        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006 年 01 月 02 日" }}</time>
         <span>·</span>
         <span>{{ .ReadingTime }} 分钟</span>
       </div>

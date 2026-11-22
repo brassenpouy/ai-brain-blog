@@ -19,6 +19,7 @@ permalinks:
 
 params:
   env: "production"
+  DateFormat: "2006 年 01 月 02 日"
   description: "Connecting Silicon with AI"
   author: "Chad"
   defaultTheme: "auto"
