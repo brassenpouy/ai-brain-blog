@@ -1,30 +1,68 @@
 {{ define "main" }}
-<section class="home-hero">
-  <p class="home-kicker">Connecting Silicon with AI</p>
-  <h1 class="home-title">{{ site.Title }}</h1>
-  <div class="home-copy md-content">
-    {{ .Content }}
-  </div>
-</section>
-
 {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
-<section class="home-list">
-  <div class="home-list-head">
-    <h2>最新文章</h2>
-    <a href="{{ "/posts/" | relLangURL }}">全部文章</a>
-  </div>
-  {{ range first 10 $pages }}
-  <article class="home-entry">
-    <a class="home-entry-link" href="{{ .RelPermalink }}">
-      <h3>{{ .Title }}</h3>
-      <p>{{ .Summary | plainify | htmlUnescape | truncate 160 }}</p>
-      <div class="home-entry-meta">
-        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
-        <span>·</span>
-        <span>{{ .ReadingTime }} 分钟</span>
+<div class="home-layout">
+  <div class="home-main">
+    <section class="home-hero">
+      <p class="home-kicker">Connecting Silicon with AI</p>
+      <h1 class="home-title">{{ site.Title }}</h1>
+      <div class="home-copy md-content">
+        {{ .Content }}
       </div>
-    </a>
-  </article>
-  {{ end }}
-</section>
+    </section>
+
+    <section class="home-list">
+      <div class="home-list-head">
+        <h2>最新文章</h2>
+        <a href="{{ "/posts/" | relLangURL }}">全部文章</a>
+      </div>
+      {{ range first 10 $pages }}
+      <article class="home-entry">
+        <a class="home-entry-link" href="{{ .RelPermalink }}">
+          <h3>{{ .Title }}</h3>
+          <p>{{ .Summary | plainify | htmlUnescape | truncate 120 }}</p>
+          <div class="home-entry-meta">
+            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+            <span>·</span>
+            <span>{{ .ReadingTime }} 分钟</span>
+          </div>
+          {{ with .Params.tags }}
+          <div class="home-entry-tags">
+            {{ range . }}<span>#{{ . }}</span>{{ end }}
+          </div>
+          {{ end }}
+        </a>
+      </article>
+      {{ end }}
+    </section>
+  </div>
+
+  <aside class="home-side">
+    <section class="side-block">
+      <h2>站点</h2>
+      <p>{{ len $pages }} 篇文章，{{ len site.Taxonomies.tags }} 个标签。</p>
+      <p>记录芯片、算力、GPU 测试和推理工程里值得深挖的问题。</p>
+    </section>
+
+    {{ with site.Taxonomies.tags.ByCount }}
+    <section class="side-block">
+      <h2>标签</h2>
+      <ul class="side-tags">
+        {{ range first 8 . }}
+        <li><a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}<span>{{ .Count }}</span></a></li>
+        {{ end }}
+      </ul>
+    </section>
+    {{ end }}
+
+    <section class="side-block">
+      <h2>索引</h2>
+      <ul class="side-links">
+        <li><a href="{{ "/posts/" | relLangURL }}">全部文章</a></li>
+        <li><a href="{{ "/archives/" | relLangURL }}">归档</a></li>
+        <li><a href="{{ "/index.xml" | relLangURL }}">RSS</a></li>
+        <li><a href="{{ "/about/" | relLangURL }}">关于</a></li>
+      </ul>
+    </section>
+  </aside>
+</div>
 {{ end }}
