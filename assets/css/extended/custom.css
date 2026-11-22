@@ -329,6 +329,67 @@ details.toc a {
     margin: 0 0 6px;
 }
 
+.list-header {
+    padding: 8px 0 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.list-title {
+    font-size: 30px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.26;
+    margin: 0;
+}
+
+.list-description {
+    color: var(--secondary);
+    font-size: 15px;
+    line-height: 1.65;
+    margin: 10px 0 0;
+}
+
+.list-subhead {
+    align-items: baseline;
+    color: var(--secondary);
+    display: flex;
+    font-size: 11.5px;
+    justify-content: space-between;
+    padding: 14px 0 10px;
+}
+
+.list-subhead a {
+    color: var(--accent);
+    font-size: 12px;
+}
+
+.posts-list {
+    margin-top: 0;
+}
+
+.posts-list .home-entry h2 {
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.4;
+    margin: 0 0 6px;
+}
+
+.posts-list .home-entry p {
+    font-size: 13.5px;
+}
+
+.list-pagination {
+    display: flex;
+    font-size: 13px;
+    justify-content: space-between;
+    margin-top: 24px;
+}
+
+.list-pagination a {
+    color: var(--accent);
+}
+
 .home-entry p {
     color: var(--secondary);
     font-size: 13px;
@@ -543,6 +604,18 @@ body {
 
     .home-entry h3 {
         font-size: 21px;
+    }
+
+    .list-title {
+        font-size: 28px;
+    }
+
+    .posts-list .home-entry h2 {
+        font-size: 19px;
+    }
+
+    .posts-list .home-entry p {
+        font-size: 14px;
     }
 
     .home-entry p {

@@ -1,0 +1,49 @@
+{{ define "main" }}
+{{ $paginator := .Paginate .RegularPages }}
+
+<header class="list-header">
+  <h1 class="list-title">{{ .Title }}</h1>
+  {{ with .Description }}
+  <p class="list-description">{{ . | plainify }}</p>
+  {{ end }}
+</header>
+
+<div class="list-subhead">
+  <span>共 {{ len .RegularPages }} 篇</span>
+  {{ with .OutputFormats.Get "rss" }}
+  <a href="{{ .RelPermalink }}">RSS</a>
+  {{ end }}
+</div>
+
+<section class="home-list posts-list">
+  {{ range $paginator.Pages }}
+  <article class="home-entry">
+    <a class="home-entry-link" href="{{ .RelPermalink }}">
+      <h2>{{ .Title }}</h2>
+      {{ with .Description }}
+      <p>{{ . | plainify }}</p>
+      {{ else }}
+      <p>{{ .Summary | plainify | htmlUnescape | truncate 140 }}</p>
+      {{ end }}
+      <div class="home-entry-meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+        <span>·</span>
+        <span>{{ .ReadingTime }} 分钟</span>
+      </div>
+      {{ with .Params.tags }}
+      <div class="home-entry-tags">
+        {{ range . }}<span>#{{ . }}</span>{{ end }}
+      </div>
+      {{ end }}
+    </a>
+  </article>
+  {{ end }}
+</section>
+
+{{ if gt $paginator.TotalPages 1 }}
+<nav class="list-pagination">
+  {{ with $paginator.Prev }}<a href="{{ .URL }}">上一页</a>{{ end }}
+  {{ with $paginator.Next }}<a href="{{ .URL }}">下一页</a>{{ end }}
+</nav>
+{{ end }}
+{{ end }}
