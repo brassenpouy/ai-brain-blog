@@ -18,6 +18,27 @@ slug: "ai-accelerator-chip-history"
 
 同一颗芯片，放在 PCIe 卡、SXM 模块、整机或云实例里，频率、功耗和显存配置都可能不同。下表的算力大多是厂商公开的芯片级峰值，稀疏/密集、FP16/FP8/FP4、芯片/系统的口径并不统一，不能直接横比。未找到可靠公开值的写 `n/a`。
 
+## 规格怎么读
+
+在比较芯片前，先弄清这些词。
+
+| 词 | 含义 | 容易误解的地方 |
+| --- | --- | --- |
+| TFLOPS | 每秒万亿次浮点运算 | 可能是 FP64、FP32、FP16 或 Tensor Core 峰值，不能混着比 |
+| TOPS | 每秒万亿次整数运算 | 常见于 INT8 推理，和浮点算力不是同一把尺子 |
+| PFLOPS | 每秒千万亿次浮点运算 | 1 PFLOPS = 1,000 TFLOPS；机架级数字还要除以芯片数 |
+| FP16 / BF16 | 16 位浮点 | BF16 动态范围更大，FP16 尾数更细；训练常用 BF16 |
+| FP8 / FP4 | 8 位 / 4 位浮点 | 带宽和算力更高，但需要缩放和校准，精度会受影响 |
+| INT8 | 8 位整数 | 常用于推理；峰值 TOPS 不能直接换算成浮点模型速度 |
+| HBM / HBM3e | 高带宽显存 | 容量决定能装多大模型，带宽决定数据喂得多快 |
+| 显存带宽 | 每秒能搬多少字节 | LLM decode 经常先卡在这里，不是先卡在峰值算力 |
+| TDP | 热设计功耗 | 不代表实际功耗，也不代表性能；散热和电力要一起看 |
+| 芯片 / 板卡 / 系统 | 三种统计范围 | 同一颗芯片做成不同整机，峰值和功耗会不同 |
+| 稀疏 / 密集 | 是否利用 2:4 等稀疏结构 | 稀疏峰值通常是密集峰值的 2 倍，不能直接横向比较 |
+| MFU | 模型 FLOPs 利用率 | 实际训练能达到峰值算力的比例，比峰值更接近真实体验 |
+
+训练看三件事：显存容量、显存带宽和互联。推理还要加一项延迟：首 token 多久出来、之后每个 token 多快。峰值算力只是上限，数据供不上时会先停。
+
 ## 五个阶段
 
 - 2015～2017：TPU v1 使用专用矩阵乘法阵列；P100、V100 进入深度学习训练。
@@ -37,8 +58,10 @@ slug: "ai-accelerator-chip-history"
 | 2020 | A100 | 40/80GB HBM2e / 2.0TB/s | BF16 312 TFLOPS；稀疏 624 | 训练/推理 |
 | 2022 | H100 | 80GB HBM3 / 3.35TB/s | FP16 989 TFLOPS；FP8 1.98 PFLOPS | LLM 训练/推理 |
 | 2024 | H200 | 141GB HBM3e / 4.8TB/s | 与 H100 同档算力 | 大模型推理 |
+| 2024 | H20 | 96GB HBM3 / 4.0TB/s | FP16 148 TFLOPS；FP8 296 TFLOPS | 中国市场推理 |
 | 2024 | B200 | 192GB HBM3e / 8TB/s | FP4 约 10 PFLOPS | 万亿参数训练/推理 |
 | 2024 | GB200 | 2×B200，384GB HBM3e / 16TB/s | FP4 约 20 PFLOPS | 机架级系统 |
+| 2025 | B300/GB300 | 288GB HBM3e / 8TB/s（单 GPU） | Blackwell Ultra，FP4 较 B200 提升 1.5x | 推理/训练 |
 
 NVIDIA 的优势来自芯片、NVLink、InfiniBand、CUDA 和整机的组合。到了 Blackwell，单卡变成双 die 封装，竞争单位从卡转向机架。
 
@@ -106,12 +129,14 @@ AMD 的卖点是大显存和相对开放的 ROCm；Intel 的 Gaudi 则更强调�
 | 2021 | 寒武纪 MLU370 | 48GB / n/a | 256 TOPS INT8 | 推理 |
 | 2022 | 寒武纪 MLU590 | 48GB HBM2 / n/a | 约 512 TOPS INT8 | 训练/推理 |
 | 2022 | 壁仞 BR100 | 64GB HBM2e / n/a | 约 1.9 PFLOPS FP16 | 训练 |
+| 2022 | 壁仞 BR104 | 32GB HBM2e / n/a | n/a | 推理 |
 | 2021 | 昆仑芯 P800 | 32GB / n/a | 256 TOPS INT8 | 推理/训练 |
 | 2019 | 阿里平头哥 Hanguang 800 | n/a | 78.6 TFLOPS FP16 | 推理 |
 | 2018 | 百度昆仑 1 | n/a | 260 TOPS INT8 | 推理 |
 | 2021 | 百度昆仑 2 | n/a | 256 TOPS INT8 | 推理 |
 | 2022 | 燧原 S60 | 32GB / n/a | n/a | 训练/推理 |
 | 2023 | 摩尔线程 MTT S4000 | 48GB GDDR6 / n/a | n/a | 训练/推理 |
+| 2026 | 摩尔线程 MTT S5000 | 80GB / 1.6TB/s | FP8 1,000 TFLOPS | 训练/推理 |
 | 2024 | 沐曦 C500 | 64GB HBM2e / n/a | n/a | 训练/推理 |
 
 软件栈同样分散：华为 CANN/MindSpore，寒武纪 BANG，壁仞 BIRENSUPA，昆仑芯接 PaddlePaddle，阿里和百度各自有云侧工具链。对客户来说，迁移成本往往比峰值算力更难忽略。
@@ -149,6 +174,6 @@ AMD 的卖点是大显存和相对开放的 ROCm；Intel 的 Gaudi 则更强调�
 
 ## 数据说明
 
-表中的时间、显存和峰值算力主要来自厂商规格页、产品发布资料和公开论文。可参考 [NVIDIA 数据中心 GPU](https://www.nvidia.com/en-us/data-center/)、[Google Cloud TPU](https://cloud.google.com/tpu/docs)、[AWS Neuron](https://aws.amazon.com/machine-learning/neuron/)、[AMD Instinct](https://www.amd.com/en/products/accelerators/instinct.html)、[Intel AI 加速器](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators.html)、[昇腾](https://www.hiascend.com/) 和 [寒武纪](https://www.cambricon.com/)。中国厂商和初创公司的部分型号公开资料有限，`n/a` 表示没有找到可靠公开值。
+表中的时间、显存和峰值算力主要来自厂商规格页、产品发布资料和公开论文。可参考 [NVIDIA 数据中心 GPU](https://www.nvidia.com/en-us/data-center/)、[Google Cloud TPU](https://cloud.google.com/tpu/docs)、[AWS Neuron](https://aws.amazon.com/machine-learning/neuron/)、[AMD Instinct](https://www.amd.com/en/products/accelerators/instinct.html)、[Intel AI 加速器](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators.html)、[昇腾](https://www.hiascend.com/)、[寒武纪](https://www.cambricon.com/) 和 [摩尔线程](https://www.mthreads.com/)。中国厂商和初创公司的部分型号公开资料有限，`n/a` 表示没有找到可靠公开值。
 
 厂商峰值不是实测性能：稀疏与密集、芯片与板卡、训练与推理的口径都不同。选型时，要把模型、batch、序列长度、精度、互联和软件栈放进同一个测试里比较。
