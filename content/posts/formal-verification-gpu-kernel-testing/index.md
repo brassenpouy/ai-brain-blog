@@ -119,7 +119,18 @@ TensorLean 验证的是编译后的 PTX；CUDA 源码不直接进入证明。证
 
 这些假设本身就是测试对象。验收报告要列出证明了什么、没证明什么、依赖什么版本，不能只写一句“已形式化验证”。
 
-## GPU driver 和 CUDA runtime 是软件栈的核心层
+## 把方法落到软件栈的不同层
+
+前面讲的是 kernel/PTX。软件栈还包括 DSL、CUDA runtime/driver 和模型集成层。验证对象不同，方法也不同。
+
+| 层 | 验证对象 | 主要手段 |
+| --- | --- | --- |
+| Kernel / PTX | 计算和内存结果 | 形式化验证、差分测试、fuzzing |
+| CuTe DSL | layout algebra、frontend、IR lowering | property-based testing、translation validation、生成物检查 |
+| CUDA runtime/driver | API contract、状态机、并发、错误恢复 | model checking、trace replay、fault injection |
+| 模型 / 集群 | 端到端结果、性能和稳定性 | 端到端测试、SLO 压测、长稳测试 |
+
+### CUDA runtime / driver
 
 NVIDIA CUDA 语境里，CUDA runtime 和 driver 通常放在一起验证。runtime 提供 `cudaMalloc`、`cudaMemcpy`、kernel launch 等接口；driver 提供 context、memory、stream、event 等底层接口。runtime 调用最终落到 driver，两层共享 context、stream、内存和错误状态。
 
@@ -144,7 +155,7 @@ driver 形式化有明显信任边界。证明通常假设 MMIO、GPU 固件和�
 
 从一个小状态机和一个无锁队列开始，比从“整个 driver 形式化”开始更现实。
 
-## 如果测的是 CuTe DSL
+### CuTe DSL
 
 CuTe DSL 的测试对象比手写 CUDA 多几层。按 NVIDIA 文档，它是 Python 嵌入式 DSL：`@jit` / `@kernel` 经过 AST 重写和 tracing，生成 IR，再 JIT 编译成 PTX，最后由 `ptxas` 生成 SASS（[CuTe DSL 介绍](https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/cute_dsl.html)）。
 
