@@ -1,8 +1,29 @@
 <script>
-if (document.querySelector(".post-views")) {
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
-  document.head.appendChild(script);
-}
+(() => {
+  const key = "silicondive-no-count";
+  const params = new URLSearchParams(window.location.search);
+  const isLocal = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+
+  try {
+    if (params.get("no_count") === "1") localStorage.setItem(key, "1");
+    if (params.get("no_count") === "0") localStorage.removeItem(key);
+  } catch {}
+
+  let optedOut = isLocal;
+  try {
+    optedOut = optedOut || localStorage.getItem(key) === "1";
+  } catch {}
+
+  if (optedOut) {
+    document.querySelectorAll(".post-views").forEach((el) => el.remove());
+    return;
+  }
+
+  if (document.querySelector(".post-views")) {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+    document.head.appendChild(script);
+  }
+})();
 </script>
