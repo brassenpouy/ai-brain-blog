@@ -20,11 +20,11 @@ slug: "ai-accelerator-chip-history"
 
 ## 五个阶段
 
-- 2015～2017：Google TPU v1 证明专用矩阵加速器可行；NVIDIA P100、V100 把 GPU 推向深度学习。
-- 2018～2020：云厂商开始自研 ASIC，AWS Inferentia、华为 Ascend、Intel Gaudi 出现；A100 成为通用训练主力。
-- 2021～2022：大模型训练需求上升，TPU v4、MI250X、H100、Gaudi2、Biren BR100 集中发布。
-- 2023～2024：生成式 AI 爆发，H200、MI300X、Trainium2、Trillium、Gaudi3 转向更大显存和更高带宽。
-- 2025～2026：Blackwell、Ironwood、TPU 8t/8i、Trainium3、MI350、Ascend 910C 等进入系统级竞争，scale-up 网络和软件栈变得和芯片本身一样重要。
+- 2015～2017：TPU v1 使用专用矩阵乘法阵列；P100、V100 进入深度学习训练。
+- 2018～2020：AWS、华为、Intel 推出自研加速器；A100 成为通用训练主力。
+- 2021～2022：TPU v4、MI250X、H100、Gaudi2、BR100 等发布，训练规模继续扩大。
+- 2023～2024：H200、MI300X、Trainium2、Trillium、Gaudi3 提升显存容量和带宽。
+- 2025～2026：Blackwell、Ironwood、TPU 8t/8i、Trainium3、MI350、Ascend 910C 进入系统级竞争；scale-up 网络和软件栈与芯片同样重要。
 
 ## NVIDIA：通用 GPU 的主线
 
@@ -40,7 +40,7 @@ slug: "ai-accelerator-chip-history"
 | 2024 | B200 | 192GB HBM3e / 8TB/s | FP4 约 10 PFLOPS | 万亿参数训练/推理 |
 | 2024 | GB200 | 2×B200，384GB HBM3e / 16TB/s | FP4 约 20 PFLOPS | 机架级系统 |
 
-NVIDIA 的关键优势不只是单芯片，而是 GPU、NVLink、InfiniBand、CUDA 和整机一起交付。到了 Blackwell，单卡已经变成双 die 封装，竞争单位也从“卡”变成“机架”。
+NVIDIA 的优势来自芯片、NVLink、InfiniBand、CUDA 和整机的组合。到了 Blackwell，单卡变成双 die 封装，竞争单位从卡转向机架。
 
 ## Google TPU：为矩阵乘法做 ASIC
 
@@ -72,7 +72,7 @@ TPU 是“芯片 + Pod + 编译栈”一起设计的典型。Ironwood 之后，G
 | 2024 | Trainium2 | 96GB HBM3 / 2.9TB/s | 1.3 PFLOPS FP8 | 大模型训练 |
 | 2025 | Trainium3 | 3nm，公开细节有限 | 约为 Trainium2 的 2 倍 | 训练 |
 
-AWS 的路线很明确：不自建通用 GPU 生态，而是用 Neuron 把训练和推理成本压到自家云实例里。代价是软件迁移需要成本。
+AWS 用 Neuron 把训练和推理成本压到自家云实例里，没有跟进通用 GPU 生态。代价是软件迁移成本。
 
 ## AMD 与 Intel：两条追赶路线
 
@@ -136,7 +136,7 @@ AMD 的卖点是大显存和相对开放的 ROCm；Intel 的 Gaudi 则更强调�
 | 2022 | Tenstorrent Wormhole | 以太网 scale-out | 训练/推理 |
 | 2024 | Tenstorrent Blackhole | 新一代 Tensix | 训练/推理 |
 
-这些公司的共同点是“用架构差异换空间”：Groq 用 SRAM 和确定性执行换低延迟，Cerebras 用晶圆级集成换带宽，Graphcore 用 IPU 换不同的并行模型，Tenstorrent 用 RISC-V 和开放软件换可定制性。
+这些公司用架构差异换空间：Groq 用 SRAM 和确定性执行换低延迟，Cerebras 用晶圆级集成换带宽，Graphcore 用 IPU 换不同的并行模型，Tenstorrent 用 RISC-V 和开放软件换可定制性。
 
 ## 横向看：算力之外的决定因素
 
@@ -151,4 +151,4 @@ AMD 的卖点是大显存和相对开放的 ROCm；Intel 的 Gaudi 则更强调�
 
 表中的时间、显存和峰值算力主要来自厂商规格页、产品发布资料和公开论文。可参考 [NVIDIA 数据中心 GPU](https://www.nvidia.com/en-us/data-center/)、[Google Cloud TPU](https://cloud.google.com/tpu/docs)、[AWS Neuron](https://aws.amazon.com/machine-learning/neuron/)、[AMD Instinct](https://www.amd.com/en/products/accelerators/instinct.html)、[Intel AI 加速器](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators.html)、[昇腾](https://www.hiascend.com/) 和 [寒武纪](https://www.cambricon.com/)。中国厂商和初创公司的部分型号公开资料有限，`n/a` 表示没有找到可靠公开值。
 
-厂商峰值不是实测性能：稀疏与密集、芯片与板卡、训练与推理的口径都不同。真正选型时，要把模型、batch、序列长度、精度、互联和软件栈放进同一个测试里比较。
+厂商峰值不是实测性能：稀疏与密集、芯片与板卡、训练与推理的口径都不同。选型时，要把模型、batch、序列长度、精度、互联和软件栈放进同一个测试里比较。
