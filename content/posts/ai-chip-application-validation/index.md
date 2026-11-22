@@ -99,6 +99,36 @@ slug: "ai-chip-application-validation"
 - **A/B 对比**：同一 workload 在参考平台和新平台上对比，拆开算力、带宽、通信、存储和软件开销。
 - **Chaos / fault injection**：主动制造故障，验证恢复路径，而不是等生产环境第一次出事。
 
+## 测试左移：从应用 workload 反推下层测试
+
+应用层测试贵，不是因为它难写，而是它慢、依赖多、失败后定位远。测试左移的目标不是把验收测试搬到下层，而是把应用层暴露出的 workload 拆成更便宜、更早跑的下层用例。
+
+真实应用至少要往下抽四类东西：
+
+- API 调用序列：allocation、kernel launch、stream、event、同步和错误处理。
+- kernel 启动参数：shape、stride、dtype、layout、动态 shape 和边界值。
+- 图与算子组合：融合、布局转换、量化、回退路径和编译器 pass 顺序。
+- 数值结果：参考输出、容差、NaN/Inf、收敛曲线和质量指标。
+
+这些素材可以在 compiler、runtime/driver 和 kernel 层变成更早的测试：
+
+| 下层 | 更早发现什么 | 常用手段 |
+| --- | --- | --- |
+| Compiler | 图覆盖、算子回退、数值偏差、codegen 错误 | LLVM lit/FileCheck、MLIR verifier、StableHLO/XLA 测试、IR fuzzing、与参考后端做 differential testing |
+| Runtime / driver | API 语义、错误码、并发、内存生命周期、版本兼容 | API contract test、CUPTI trace replay、CUDA/HIP 测试、OpenCL/SYCL/Vulkan CTS、故障注入 |
+| Kernel / library | 边界 shape、stride、dtype、精度和越界 | 与参考 kernel 对比、property-based testing、compute-sanitizer、microbenchmark |
+| Virtual platform | 芯片回来前的功能与接口问题 | 功能模型、FPGA 原型、RTL 仿真；验证语义和覆盖，不替代最终性能 |
+
+这里有两个关键做法。
+
+一是 contract testing。上一层和下一层约定好 API 的行为：错误码是什么、stream 是否保序、异步拷贝什么时候完成、内存什么时候可以释放。下层测试按 contract 测，不必每次都拉起完整模型。
+
+二是 trace replay。用 CUPTI、ROCm tracer 或类似机制抓一段真实应用的 API 和 kernel trace，在新 driver/runtime 上重放，比较调用是否成功、输出是否在容差内、耗时有没有明显回归。它比完整端到端测试轻，又比手写单元测试更接近真实 workload。
+
+芯片还没回来时，可以用功能模型、FPGA 原型或 RTL 仿真跑 compiler、runtime 和 driver 测试。它们不能替代最终性能测试，但能在流片前抓出接口、语义和覆盖问题。
+
+测试左移不意味着只做下层测试。下层测试便宜、定位快，但容易漏掉集成问题；应用层验收慢、成本高，但最接近客户。好的做法是让每一层都跑，把快的下层测试放进每次提交，把模型和客户 workload 放进 nightly 或发布前回归。
+
 ## 工具地图
 
 工具不是方法论，但能把验证做得可重复。
@@ -107,6 +137,8 @@ slug: "ai-chip-application-validation"
 | --- | --- | --- |
 | 标准基准 | MLPerf Training / Inference / Storage | 行业基线、time-to-train、SLO |
 | 算子与数值 | PyTorch testing、ONNX Runtime、compute-sanitizer | 覆盖率、误差、越界和非法访问 |
+| Compiler | LLVM lit/FileCheck、MLIR verifier、StableHLO/XLA 测试、Triton/torch.compile 测试 | 图覆盖、算子回退、数值和 codegen |
+| Runtime / driver | CUPTI、nsys、CUDA/HIP API 测试、OpenCL/SYCL/Vulkan CTS | API 语义、错误码、并发和版本兼容 |
 | Profiling | Nsight Systems、Nsight Compute、PyTorch Profiler、rocprof、XProf | kernel 时间、访存、占用率、通信等待 |
 | 分布式 | nccl-tests、OSU Micro-Benchmarks、torchrun | all-reduce 带宽、扩展效率、通信瓶颈 |
 | 推理服务 | vLLM benchmark、SGLang benchmark、genai-perf、perf_analyzer、k6/Locust | TTFT、TPOT、p99、并发上限 |
