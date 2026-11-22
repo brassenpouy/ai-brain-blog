@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-labelledby="title desc">
+  <title id="title">MoE 与 looped transformer 的硬件取舍</title>
+  <desc id="desc">MoE 参数总量大、每个 token 只激活少数专家，适合数据中心；looped transformer 权重小、重复计算，适合笔记本。</desc>
+  <rect width="480" height="360" fill="#f8f7f4"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#202326">
+    <text x="20" y="28" font-size="20" font-weight="700">两种架构，两种取舍</text>
+    <text x="20" y="48" font-size="13" fill="#6a6e72">MoE 用内存换计算；looped transformer 用计算换内存</text>
+
+    <rect x="20" y="66" width="440" height="120" rx="7" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <text x="36" y="91" font-size="16" font-weight="650">MoE · 数据中心</text>
+    <text x="36" y="112" font-size="12" fill="#6a6e72">专家很多，每个 token 只走少数几条路</text>
+
+    <g fill="#e8efed" stroke="#e4e1d9">
+      <rect x="222" y="78" width="22" height="22" rx="3"/>
+      <rect x="250" y="78" width="22" height="22" rx="3"/>
+      <rect x="278" y="78" width="22" height="22" rx="3"/>
+      <rect x="306" y="78" width="22" height="22" rx="3"/>
+      <rect x="334" y="78" width="22" height="22" rx="3"/>
+      <rect x="362" y="78" width="22" height="22" rx="3"/>
+      <rect x="390" y="78" width="22" height="22" rx="3"/>
+      <rect x="418" y="78" width="22" height="22" rx="3"/>
+    </g>
+
+    <text x="36" y="144" font-size="12" fill="#6a6e72">内存</text>
+    <rect x="80" y="136" width="190" height="9" rx="4" fill="#2f5d60"/>
+    <text x="36" y="166" font-size="12" fill="#6a6e72">计算</text>
+    <rect x="80" y="158" width="52" height="9" rx="4" fill="#b98a92"/>
+
+    <rect x="20" y="204" width="440" height="120" rx="7" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <text x="36" y="229" font-size="16" font-weight="650">Looped transformer · 笔记本</text>
+    <text x="36" y="250" font-size="12" fill="#6a6e72">一套权重，重复使用 N 次</text>
+
+    <rect x="250" y="220" width="92" height="48" rx="8" fill="#f2e8e8" stroke="#b98a92"/>
+    <text x="296" y="249" font-size="12" text-anchor="middle" fill="#7a4a58">block</text>
+    <path d="M342 228 H378 V288 H342" fill="none" stroke="#b98a92" stroke-width="1.5"/>
+    <path d="M342 288 l6 -4 v8 z" fill="#b98a92"/>
+    <text x="388" y="214" font-size="12" fill="#6a6e72">× N</text>
+
+    <text x="36" y="282" font-size="12" fill="#6a6e72">内存</text>
+    <rect x="80" y="274" width="44" height="9" rx="4" fill="#2f5d60"/>
+    <text x="36" y="304" font-size="12" fill="#6a6e72">计算</text>
+    <rect x="80" y="296" width="190" height="9" rx="4" fill="#b98a92"/>
+
+    <text x="20" y="348" font-size="12" fill="#6a6e72">架构没有绝对好坏，先看部署目标和 batch 大小</text>
+  </g>
+</svg>
