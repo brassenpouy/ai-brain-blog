@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 330" role="img" aria-labelledby="title desc">
+  <title id="title">大模型 trace 的四个层次</title>
+  <desc id="desc">从 HTTP 请求、token 序列、CUDA API 和 kernel，到可重放的 CUDA Graph。</desc>
+  <rect width="480" height="330" fill="#f8f7f4"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#202326">
+    <text x="20" y="28" font-size="20" font-weight="700">trace 不是一种东西</text>
+    <text x="20" y="48" font-size="13" fill="#6a6e72">越往下越接近硬件，能回答的问题也不同</text>
+
+    <rect x="20" y="68" width="440" height="50" rx="6" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="20" y="68" width="5" height="50" rx="2.5" fill="#2f5d60"/>
+    <text x="38" y="88" font-size="14" font-weight="600">HTTP / JSON API trace</text>
+    <text x="38" y="106" font-size="12" fill="#6a6e72">请求、响应、时间戳、工具调用</text>
+    <text x="442" y="98" font-size="12" fill="#2f5d60" text-anchor="end">记录 / 回放</text>
+
+    <rect x="20" y="130" width="440" height="50" rx="6" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="20" y="130" width="5" height="50" rx="2.5" fill="#7faaa7"/>
+    <text x="38" y="150" font-size="14" font-weight="600">Token trace</text>
+    <text x="38" y="168" font-size="12" fill="#6a6e72">prompt、输出 token、logprob、采样参数</text>
+    <text x="442" y="160" font-size="12" fill="#2f5d60" text-anchor="end">强制 token</text>
+
+    <rect x="20" y="192" width="440" height="50" rx="6" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="20" y="192" width="5" height="50" rx="2.5" fill="#b3c2bf"/>
+    <text x="38" y="212" font-size="14" font-weight="600">CUDA API / kernel trace</text>
+    <text x="38" y="230" font-size="12" fill="#6a6e72">runtime/driver 调用、kernel、memcpy、stream</text>
+    <text x="442" y="222" font-size="12" fill="#2f5d60" text-anchor="end">分析</text>
+
+    <rect x="20" y="254" width="440" height="50" rx="6" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="20" y="254" width="5" height="50" rx="2.5" fill="#b98a92"/>
+    <text x="38" y="274" font-size="14" font-weight="600">CUDA Graph</text>
+    <text x="38" y="292" font-size="12" fill="#6a6e72">被捕获的计算图，可重复 launch</text>
+    <text x="442" y="284" font-size="12" fill="#7a4a58" text-anchor="end">重放</text>
+
+    <text x="20" y="322" font-size="12" fill="#6a6e72">不要拿一层 trace 去回答另一层的问题</text>
+  </g>
+</svg>
