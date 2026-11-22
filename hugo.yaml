@@ -41,7 +41,7 @@ params:
   socialIcons: []
   cloudflareWebAnalytics:
     # Cloudflare Dashboard -> Web Analytics -> Add a site -> copy the token.
-    token: ""
+    token: "b8f8464850874ce2b7be16dcd9a4ac8e"
   footer:
     hideCopyright: false
     text: "[RSS](/index.xml/)"
