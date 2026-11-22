@@ -198,6 +198,14 @@ details.toc a {
     max-width: 100%;
 }
 
+.post-content img[src$=".svg"] {
+    background: transparent;
+    border: 0;
+    margin: 2em auto;
+    max-width: 480px;
+    width: 100%;
+}
+
 .post-single .post-tags {
     gap: 14px;
     margin-top: 8px;
