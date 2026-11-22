@@ -1,0 +1,90 @@
+baseURL: "https://silicondive.com/"
+locale: "zh-CN"
+defaultContentLanguage: "zh"
+title: "硅基深潜"
+theme: "PaperMod"
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: false
+hasCJKLanguage: true
+
+pagination:
+  pagerSize: 10
+
+permalinks:
+  posts: "/posts/:slug/"
+
+params:
+  env: "production"
+  description: "Connecting Silicon with AI"
+  author: "brassenpouy"
+  defaultTheme: "auto"
+  disableThemeToggle: false
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: false
+  ShowCodeCopyButtons: true
+  ShowWordCount: false
+  ShowRssButtonInSectionTermList: true
+  ShowFullTextinRSS: true
+  ShowToc: true
+  TocOpen: false
+  comments: false
+  hideFooter: false
+  disableScrollToTop: false
+  mainSections:
+    - posts
+  socialIcons: []
+  footer:
+    hideCopyright: false
+    text: "[RSS](/index.xml/)"
+  assets:
+    favicon: "favicon.ico"
+    favicon16x16: "favicon-16x16.png"
+    favicon32x32: "favicon-32x32.png"
+    apple_touch_icon: "apple-touch-icon.png"
+    safari_pinned_tab: "safari-pinned-tab.svg"
+    theme_color: "#0f5f6b"
+    msapplication_TileColor: "#0f5f6b"
+
+menu:
+  main:
+    - identifier: posts
+      name: "文章"
+      url: "/posts/"
+      weight: 10
+    - identifier: tags
+      name: "标签"
+      url: "/tags/"
+      weight: 20
+    - identifier: archives
+      name: "归档"
+      url: "/archives/"
+      weight: 30
+    - identifier: about
+      name: "关于"
+      url: "/about/"
+      weight: 40
+
+outputs:
+  home:
+    - HTML
+    - RSS
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: false
+  highlight:
+    noClasses: false
+    style: "github"
+    lineNos: false
+    codeFences: true
+    guessSyntax: true
+  tableOfContents:
+    startLevel: 2
+    endLevel: 3
