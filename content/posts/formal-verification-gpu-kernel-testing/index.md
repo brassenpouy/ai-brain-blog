@@ -142,6 +142,39 @@ driver 形式化有明显信任边界。证明通常假设 MMIO、GPU 固件和�
 
 从一个小状态机和一个无锁队列开始，比从“整个 driver 形式化”开始更现实。
 
+## 如果测的是 CuTe DSL
+
+CuTe DSL 的测试对象比手写 CUDA 多几层。按 NVIDIA 文档，它是 Python 嵌入式 DSL：`@jit` / `@kernel` 经过 AST 重写和 tracing，生成 IR，再 JIT 编译成 PTX，最后由 `ptxas` 生成 SASS（[CuTe DSL 介绍](https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/cute_dsl.html)）。
+
+TensorLean 在 PTX 层做证明。它不覆盖 Python frontend、IR lowering 和 JIT 缓存。CuTe DSL 的测试要按这些层分开。
+
+| 层 | 测什么 | 方法 |
+| --- | --- | --- |
+| Layout algebra | shape、stride、cosize、composition、swizzle | 与 C++ CuTe 参考实现做 property-based testing；必要时用 SMT 检查整数约束 |
+| DSL frontend | AST 重写、tracing、static/dynamic layout、类型推断 | 同一 kernel 用不同写法生成 IR/PTX，做差分测试 |
+| IR / lowering | tiled copy、MMA、TMA、cluster、pipeline | IR 语义检查、translation validation、与参考 kernel 对比 |
+| PTX | 关键 kernel 的功能正确性 | TensorLean 式形式化验证，覆盖所有输入和线程调度 |
+| JIT / runtime | 缓存键、架构、编译选项、动态 shape | 缓存失效回归、ABI 测试、`keep-ptx` 检查生成物 |
+| 性能 | 吞吐、延迟、占用、显存 | benchmark、Nsight Systems/Compute；证明不覆盖性能 |
+
+CuTe DSL 和 TensorLean 在方法上有一个直接对应：**数学计算和 layout 分开写规格**。
+
+CuTe 的 layout algebra 本身就是独立对象。可以先证明 layout 映射正确，再证明这个 layout 上的 kernel 数学正确。测试时也应该分开：
+
+- layout 层检查 `shape/stride/cosize`、对齐、越界、swizzle 和 tile 映射。
+- kernel 层检查 `O = softmax(QKᵀ/√d)V` 这类数学结果，容差单独定义。
+
+CuTe DSL 还有一些手写 CUDA 不会遇到的测试点：
+
+- **JIT 缓存键**：架构、编译选项、layout、dtype 变化后是否重新编译；缓存命中是否拿到旧 kernel。
+- **动态 shape**：文档说明 CuTe layout algebra 目前只支持 32 位 shape/stride，边界值要单独覆盖。
+- **生成物检查**：用 `keep-ptx` 保留 PTX，检查关键指令、寄存器、共享内存和预期是否一致。
+- **异步 pipeline**：TMA、async copy、warp specialization 会改变线程调度和内存序，普通随机输入测不到这些路径。
+
+形式化验证在这里的落点要往后放：先做 layout algebra 和 frontend 的差分测试，再选一个高风险 kernel 对生成的 PTX 做证明。论文明确说它验证的部分 PTX 是手写的；CuTe 生成的真实编译产物包含内联和优化，证明难度更高。
+
+这层仍然要保留信任边界。CuTe DSL frontend、IR lowering、`ptxas` 和硬件都不在 TensorLean 的证明范围内。PTX 证明通过，只能说明这段 PTX 符合规格，不能说明 CuTe 编译器没有错误地生成它。
+
 ## 怎么落到 AI 芯片软件栈
 
 一个可执行的路线：
