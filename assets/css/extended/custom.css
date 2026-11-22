@@ -12,7 +12,7 @@
     --secondary: #5b6573;
     --tertiary: #e8e8e4;
     --content: #24292f;
-    --code-block-bg: #1f2328;
+    --code-block-bg: #f4f4f1;
     --code-bg: #f4f4f1;
     --border: #e2e2dd;
     --accent: #0f5f6b;
@@ -85,6 +85,17 @@ body {
 .post-content pre {
     border: 1px solid var(--border);
     border-radius: var(--radius);
+}
+
+:root:not([data-theme="dark"]) .post-content pre,
+:root:not([data-theme="dark"]) .post-content .highlight,
+:root:not([data-theme="dark"]) .post-content .highlight pre,
+:root:not([data-theme="dark"]) .post-content .chroma {
+    background: var(--code-bg) !important;
+}
+
+:root:not([data-theme="dark"]) .post-content pre code {
+    color: var(--content) !important;
 }
 
 .post-content code {
