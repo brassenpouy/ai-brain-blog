@@ -48,8 +48,8 @@ params:
     favicon32x32: "favicon-32x32.png"
     apple_touch_icon: "apple-touch-icon.png"
     safari_pinned_tab: "safari-pinned-tab.svg"
-    theme_color: "#0f5f6b"
-    msapplication_TileColor: "#0f5f6b"
+    theme_color: "#2f5d60"
+    msapplication_TileColor: "#2f5d60"
 
 menu:
   main:

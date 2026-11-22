@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" role="img" aria-labelledby="title desc">
   <title id="title">KV cache 由总 token 数决定</title>
   <desc id="desc">32 个 4K 请求和 1 个 128K 请求都是 131072 个 token，KV cache 都约为 40 GiB。</desc>
-  <rect width="480" height="270" fill="#fbfbf8"/>
-  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#1f2328">
+  <rect width="480" height="270" fill="#f8f7f4"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#202326">
     <text x="20" y="30" font-size="20" font-weight="700">并发和上下文，花同一笔 KV 预算</text>
-    <text x="20" y="51" font-size="14" fill="#5b6573">KV cache ≈ 总 token 数 × 320 KiB</text>
+    <text x="20" y="51" font-size="14" fill="#6a6e72">KV cache ≈ 总 token 数 × 320 KiB</text>
 
-    <rect x="20" y="75" width="210" height="120" rx="8" fill="#ffffff" stroke="#e2e2dd"/>
+    <rect x="20" y="75" width="210" height="120" rx="8" fill="#fdfdfb" stroke="#e4e1d9"/>
     <text x="36" y="103" font-size="16" font-weight="650">32 个并发请求</text>
-    <text x="36" y="127" font-size="14" fill="#5b6573">每个 4,096 token</text>
+    <text x="36" y="127" font-size="14" fill="#6a6e72">每个 4,096 token</text>
     <text x="36" y="158" font-size="20" font-weight="650">131,072 token</text>
-    <text x="36" y="182" font-size="14" fill="#5b6573">约 40 GiB</text>
+    <text x="36" y="182" font-size="14" fill="#6a6e72">约 40 GiB</text>
 
-    <rect x="250" y="75" width="210" height="120" rx="8" fill="#ffffff" stroke="#e2e2dd"/>
+    <rect x="250" y="75" width="210" height="120" rx="8" fill="#fdfdfb" stroke="#e4e1d9"/>
     <text x="266" y="103" font-size="16" font-weight="650">1 个长上下文请求</text>
-    <text x="266" y="127" font-size="14" fill="#5b6573">单个 128K token</text>
+    <text x="266" y="127" font-size="14" fill="#6a6e72">单个 128K token</text>
     <text x="266" y="158" font-size="20" font-weight="650">131,072 token</text>
-    <text x="266" y="182" font-size="14" fill="#5b6573">约 40 GiB</text>
+    <text x="266" y="182" font-size="14" fill="#6a6e72">约 40 GiB</text>
 
-    <text x="20" y="235" font-size="14" fill="#5b6573">总 token 数相同，KV cache 也相同。</text>
+    <text x="20" y="235" font-size="14" fill="#6a6e72">总 token 数相同，KV cache 也相同。</text>
   </g>
 </svg>
