@@ -26,6 +26,8 @@ slug: "llm-api-trace-capture-replay"
 
 抓错层，问题就答不对。想看用户请求怎么变慢，抓 HTTP trace；想看 kernel 为什么空转，抓 CUDA trace；想减少 decode 的 launch 开销，用 CUDA Graph。
 
+这里的“API”有两层含义。大模型服务对外通常暴露 HTTP/JSON 接口；一次请求从 HTTP 进入，经过 tokenizer、调度器、推理引擎，最后落到 CUDA kernel。HTTP trace 记录入口，CUDA trace 记录设备侧执行，两边可以用同一个 request ID 或 trace ID 关联。
+
 ## 基础概念
 
 **trace** 是一次执行留下的事件记录：什么时间、调用了什么、参数是什么、执行了多久。
