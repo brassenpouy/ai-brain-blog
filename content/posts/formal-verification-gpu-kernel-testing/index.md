@@ -14,7 +14,7 @@ slug: "formal-verification-gpu-kernel-testing"
 
 ## 一条帖子背后的论文
 
-Daniel Lemire 在 x.com 上说，他正在把越来越多的高性能代码拿去做形式化验证。他的原话很直接：这些项目为了性能“带着剪刀奔跑”，测试和验证已经很多，但形式化验证仍然值得加（[原帖](https://x.com/lemire/status/2124175237419815389)）。
+Daniel Lemire 在 x.com 上说，他正在把越来越多的高性能代码拿去做形式化验证。他的说法是：这些项目为了性能“带着剪刀奔跑”，测试和验证已经很多，但形式化验证仍然值得加（[原帖](https://x.com/lemire/status/2124175237419815389)）。
 
 帖子配的论文是 Columbia 和 CertiK 的 **From Math to Machine, in Minutes: Formal Verification of Production GPU Kernels**，工具叫 TensorLean（[项目页](https://tensorlean.ai/)，[论文](https://arxiv.org/html/2611.04447v1)）。
 
@@ -57,7 +57,7 @@ TensorLean 验证的是编译后的 PTX；CUDA 源码不直接进入证明。证
 - 输出在给定浮点容差内；
 - 不改动不该改的内存。
 
-这带来一个很重要的区别：测试告诉你“这组输入没问题”，形式化验证告诉你“在这套 PTX 语义和前置条件下，不存在反例”。
+区别在于：测试说明这组输入没问题；形式化验证说明在这套 PTX 语义和前置条件下不存在反例。
 
 论文也明确写了边界：它假设 `ptxas` 和硬件正确实现 PTX，不证明 kernel 一定终止，也不处理所有 PTX 特性。证明是“部分正确性”：完成的执行不会给出错误结果，但不保证一定结束。
 
@@ -97,7 +97,7 @@ TensorLean 验证的是编译后的 PTX；CUDA 源码不直接进入证明。证
 
 形式化验证证明的是功能正确性，不是速度。一个 kernel 可以证明完全正确，同时在目标 GPU 上很慢，或者在多卡通信、显存压力、批处理变化下表现很差。
 
-所以测试金字塔不会变成“证明 + 结束”，而是多一层：
+测试金字塔因此多一层：
 
 | 层次 | 主要手段 | 回答的问题 |
 | --- | --- | --- |
@@ -136,7 +136,7 @@ TensorLean 证明 PTX kernel；CUDA runtime/driver 管这些 kernel 怎么被提
 | reset / recovery / suspend | TLA+、故障注入 | 状态机、队列和内存恢复 |
 | 硬件 / 固件 | 仿真、FPGA、真实卡 | MMIO、固件、硬件行为 |
 
-CUDA runtime/driver 的很多 bug 不在单条指令，而在状态机和并发交错：一个 ioctl 的失败路径没有回滚，fence 等待和 reset 撞在一起，多进程同时 map 同一块 VA，suspend 时还有队列没排空。这些场景适合模型检查和小范围代码验证。
+CUDA runtime/driver 的 bug 常出现在状态机和并发交错：ioctl 的失败路径没有回滚，fence 等待和 reset 撞在一起，多进程同时 map 同一块 VA，suspend 时队列没有排空。这些场景适合模型检查和小范围代码验证。
 
 工具上，TLA+ 适合协议和状态机，Loom 适合 Rust 并发，Kani/Verus/CBMC 适合 C/Rust 的局部数据结构和边界路径；syzkaller、KASAN、KCSAN、lockdep 和故障注入负责把真实系统里的异常路径跑出来。
 
@@ -193,7 +193,7 @@ CuTe DSL 还有一些手写 CUDA 不会遇到的测试点：
 
 ## 边界
 
-TensorLean 的结果很强，但不是通用解决方案：
+TensorLean 有明确边界：
 
 - 论文验证的部分 PTX 是手写的，真实编译器的内联和优化会让证明更难。
 - 没有证明终止性，也没有证明 ISA 级 undefined behavior 不存在。
