@@ -43,6 +43,8 @@ slug: "70b-inference-memory-budget"
 
 70B 在开源模型里算中大，但不是最大一档；这里只讨论 dense 模型，MoE 还要区分 total parameters 和每个 token 的 active parameters。
 
+它不是当前最强的一档。闭源前沿模型通常不公开参数量，能力、上下文和工具使用更强；70B 更适合需要自己部署、微调或控制成本的场景。
+
 ## KV cache 会随上下文增长
 
 模型生成 token 时，attention 会为每个 token 生成 Q、K、V。新的 token 要用当前的 Q 和前面所有 token 的 K 匹配，再取对应的 V。
