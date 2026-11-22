@@ -19,6 +19,6 @@ comments: false
 - 芯片与软件栈的测试、验证和交付
 - 把复杂概念讲清楚的科普文章
 
-## 联系
+## 联系方式
 
 邮箱：[chad.zha0604@gmail.com](mailto:chad.zha0604@gmail.com)
