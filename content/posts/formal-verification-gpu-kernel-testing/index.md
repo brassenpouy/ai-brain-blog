@@ -119,6 +119,29 @@ TensorLean 验证的是编译后的 PTX；CUDA 源码不直接进入证明。证
 
 这些假设本身就是测试对象。验收报告要列出证明了什么、没证明什么、依赖什么版本，不能只写一句“已形式化验证”。
 
+## 如果测的是 GPU driver
+
+TensorLean 的证明对象是 PTX kernel；driver 在 host 侧，管 ioctl、GPU VA 映射、队列提交、fence、中断、reset 和电源。两者不在同一层。
+
+可以借用的是方法，不是证明对象。形式化验证先落在 driver 的局部契约，不要一上来覆盖整个驱动。
+
+| driver 部件 | 适合的手段 | 重点 |
+| --- | --- | --- |
+| UAPI / ioctl | contract test、model-based testing、syzkaller | 参数校验、错误码、状态转换 |
+| GPU VA / 页表 | TLA+、Alloy、故障注入 | map/unmap、pin/unpin、迁移、回收 |
+| command ring / 提交队列 | Loom、Verus、Kani、CBMC | 生产者消费者、内存序、回绕 |
+| fence / event / 中断 | TLA+、Spin、压力测试 | 完成顺序、丢失/重复中断、超时 |
+| reset / recovery / suspend | TLA+、故障注入 | 状态机、队列和内存恢复 |
+| 硬件 / 固件 | 仿真、FPGA、真实卡 | MMIO、固件、硬件行为 |
+
+driver 的很多 bug 不在单条指令，而在状态机和并发交错：一个 ioctl 的失败路径没有回滚，fence 等待和 reset 撞在一起，多进程同时 map 同一块 VA，suspend 时还有队列没排空。这些场景适合模型检查和小范围代码验证。
+
+工具上，TLA+ 适合协议和状态机，Loom 适合 Rust 并发，Kani/Verus/CBMC 适合 C/Rust 的局部数据结构和边界路径；syzkaller、KASAN、KCSAN、lockdep 和故障注入负责把真实系统里的异常路径跑出来。
+
+这一层仍然有信任边界。driver 的形式化通常假设 MMIO、GPU 固件和硬件行为符合模型；这些假设要靠仿真、FPGA、真实卡和长稳测试覆盖。
+
+从一个小状态机和一个无锁队列开始，比从“整个 driver 形式化”开始更现实。
+
 ## 怎么落到 AI 芯片软件栈
 
 一个可执行的路线：
