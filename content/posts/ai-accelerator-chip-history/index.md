@@ -1,5 +1,5 @@
 ---
-title: "AI 算力芯片谱系：从 GPU 到 TPU 和国产加速器"
+title: "AI 算力芯片谱系：从通用 GPU 到专用 ASIC"
 date: "2026-11-22"
 description: "按公司和代际整理 NVIDIA、Google、AWS、AMD、Intel、华为、寒武纪等 AI 加速器的主要产品、公开规格、软件栈和适用场景。"
 tags:
