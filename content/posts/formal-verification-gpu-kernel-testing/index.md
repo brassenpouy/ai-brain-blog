@@ -119,22 +119,24 @@ TensorLean 验证的是编译后的 PTX；CUDA 源码不直接进入证明。证
 
 这些假设本身就是测试对象。验收报告要列出证明了什么、没证明什么、依赖什么版本，不能只写一句“已形式化验证”。
 
-## GPU driver 是软件栈的核心层
+## GPU driver 和 CUDA runtime 是软件栈的核心层
 
-GPU driver 属于 host 侧软件栈的核心层。向上承接 framework、runtime 和 compiler，向下通过 ioctl、MMIO 和中断管理 GPU 的资源、队列、内存、同步和错误恢复。TensorLean 证明 PTX kernel；driver 管这些 kernel 怎么被提交、同步和回收。两者层级不同，但都在软件栈里。
+NVIDIA CUDA 语境里，CUDA runtime 和 driver 通常放在一起验证。runtime 提供 `cudaMalloc`、`cudaMemcpy`、kernel launch 等接口；driver 提供 context、memory、stream、event 等底层接口。runtime 调用最终落到 driver，两层共享 context、stream、内存和错误状态。
 
-形式化方法可以借用，证明对象要换成 driver 的 contract。先做局部契约，不要一上来覆盖整个驱动。
+测试通常按“CUDA runtime + driver 栈”设计，检查 context 创建、stream 顺序、event 语义、内存生命周期、错误码和版本兼容。只测其中一层，会漏掉跨层状态。
+
+TensorLean 证明 PTX kernel；CUDA runtime/driver 管这些 kernel 怎么被提交、同步和回收。形式化方法可以借用，证明对象要换成 runtime/driver 的 contract。先做局部契约，不要一上来覆盖整个栈。
 
 | driver 部件 | 适合的手段 | 重点 |
 | --- | --- | --- |
-| UAPI / ioctl | contract test、model-based testing、syzkaller | 参数校验、错误码、状态转换 |
+| CUDA runtime / driver API、ioctl | contract test、model-based testing、差分测试、syzkaller | context、stream、event、内存、错误码、版本兼容 |
 | GPU VA / 页表 | TLA+、Alloy、故障注入 | map/unmap、pin/unpin、迁移、回收 |
 | command ring / 提交队列 | Loom、Verus、Kani、CBMC | 生产者消费者、内存序、回绕 |
 | fence / event / 中断 | TLA+、Spin、压力测试 | 完成顺序、丢失/重复中断、超时 |
 | reset / recovery / suspend | TLA+、故障注入 | 状态机、队列和内存恢复 |
 | 硬件 / 固件 | 仿真、FPGA、真实卡 | MMIO、固件、硬件行为 |
 
-driver 的很多 bug 不在单条指令，而在状态机和并发交错：一个 ioctl 的失败路径没有回滚，fence 等待和 reset 撞在一起，多进程同时 map 同一块 VA，suspend 时还有队列没排空。这些场景适合模型检查和小范围代码验证。
+CUDA runtime/driver 的很多 bug 不在单条指令，而在状态机和并发交错：一个 ioctl 的失败路径没有回滚，fence 等待和 reset 撞在一起，多进程同时 map 同一块 VA，suspend 时还有队列没排空。这些场景适合模型检查和小范围代码验证。
 
 工具上，TLA+ 适合协议和状态机，Loom 适合 Rust 并发，Kani/Verus/CBMC 适合 C/Rust 的局部数据结构和边界路径；syzkaller、KASAN、KCSAN、lockdep 和故障注入负责把真实系统里的异常路径跑出来。
 
@@ -179,11 +181,11 @@ CuTe DSL 还有一些手写 CUDA 不会遇到的测试点：
 
 一个可执行的路线：
 
-1. 画出层间契约：framework/runtime、driver UAPI、MMIO/firmware 各层负责什么。
+1. 画出层间契约：framework/compiler、CUDA runtime/driver、MMIO/firmware 各层负责什么。
 2. 选 3～5 个高风险 kernel，写 tensor 级规格，用 PyTorch/CPU 参考实现校验规格。
 3. 对编译后的 PTX 做形式化验证，记录 PTX ISA、编译器版本、GPU 架构和容差。
-4. 在 driver 里选 1～2 个状态机（reset/recovery、VM map/unmap）和 1 个无锁结构（提交队列或 fence），做局部模型检查。
-5. 把证明和 driver 检查接入 CI，与差分测试、fuzzing、sanitizer、故障注入一起跑。
+4. 在 CUDA runtime/driver 栈里选 1～2 个状态机（reset/recovery、VM map/unmap）和 1 个无锁结构（提交队列或 fence），做局部模型检查。
+5. 把证明和 runtime/driver 检查接入 CI，与差分测试、fuzzing、sanitizer、故障注入一起跑。
 6. 端到端模型、性能、硬件和长稳测试继续保留，不用证明替代。
 7. 把规格、证明、未证明假设和已知 bug 一起交给客户或下游团队。
 
@@ -199,4 +201,4 @@ TensorLean 的结果很强，但不是通用解决方案：
 - 浮点容差和规格需要人来定，规格错误不会被证明检查器发现。
 - 性能、分布式通信、数据管线和硬件可靠性仍然要靠传统测试。
 
-对软件栈测试的启发是：**把“算得对”从抽样判断升级成可检查的规格，把验证对象从源码下移到生成代码和 driver 契约，然后让形式化证明、差分测试、集成测试和性能测试各管一层。** 形式化验证是其中一层，不能替代其他层。
+对软件栈测试的启发是：**把“算得对”从抽样判断升级成可检查的规格，把验证对象从源码下移到生成代码和 CUDA runtime/driver 契约，然后让形式化证明、差分测试、集成测试和性能测试各管一层。** 形式化验证是其中一层，不能替代其他层。
