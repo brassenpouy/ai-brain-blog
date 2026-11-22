@@ -20,7 +20,7 @@ permalinks:
 params:
   env: "production"
   description: "Connecting Silicon with AI"
-  author: "brassenpouy"
+  author: "Chad"
   defaultTheme: "auto"
   disableThemeToggle: false
   ShowReadingTime: true

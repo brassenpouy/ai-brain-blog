@@ -17,4 +17,4 @@ comments: false
 
 ## 3. 怎么联系
 
-GitHub：[@brassenpouy](https://github.com/brassenpouy)
+邮箱：[chad.zha0604@gmail.com](mailto:chad.zha0604@gmail.com)
