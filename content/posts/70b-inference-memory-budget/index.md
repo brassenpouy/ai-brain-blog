@@ -33,7 +33,7 @@ slug: "70b-inference-memory-budget"
 
 权重精度和 KV cache 精度是两件事，权重用 FP8，不代表 KV cache 也自动变成 FP8。
 
-Llama 3.3 70B 和 Qwen2.5 72B 都属于这个量级。70B 在开源模型里算中大，但不是最大一档；这里只讨论 dense 模型，MoE 还要区分 total parameters 和每个 token 的 active parameters。
+常见的 70B 级模型有 Llama 3.3 70B、Llama 3.1 70B、Qwen2.5 72B、DeepSeek-R1-Distill-Llama-70B、Hermes 4 70B。70B 在开源模型里算中大，但不是最大一档；这里只讨论 dense 模型，MoE 还要区分 total parameters 和每个 token 的 active parameters。
 
 ## KV cache 会随上下文增长
 

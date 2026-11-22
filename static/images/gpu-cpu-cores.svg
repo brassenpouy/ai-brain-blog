@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-labelledby="title desc">
+  <title id="title">CPU 和 GPU 的分工不同</title>
+  <desc id="desc">CPU 有少量强核心，适合复杂串行任务；GPU 有大量简单核心，适合大量相同的小计算。</desc>
+  <rect width="480" height="320" fill="#f8f7f4"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#202326">
+    <text x="20" y="30" font-size="20" font-weight="700">CPU 和 GPU 的分工不同</text>
+    <text x="20" y="51" font-size="14" fill="#6a6e72">不是谁替代谁，而是适合的任务不同</text>
+
+    <rect x="20" y="76" width="210" height="190" rx="8" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <text x="36" y="105" font-size="18" font-weight="650">CPU</text>
+    <text x="36" y="127" font-size="13" fill="#6a6e72">少量强核心</text>
+    <rect x="44" y="146" width="54" height="44" rx="5" fill="#2f5d60"/>
+    <rect x="108" y="146" width="54" height="44" rx="5" fill="#2f5d60"/>
+    <rect x="44" y="200" width="54" height="44" rx="5" fill="#2f5d60"/>
+    <rect x="108" y="200" width="54" height="44" rx="5" fill="#2f5d60"/>
+    <text x="36" y="258" font-size="13" fill="#6a6e72">适合复杂、串行任务</text>
+
+    <rect x="250" y="76" width="210" height="190" rx="8" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <text x="266" y="105" font-size="18" font-weight="650">GPU</text>
+    <text x="266" y="127" font-size="13" fill="#6a6e72">大量简单核心</text>
+    <g fill="#7faaa7">
+      <rect x="270" y="146" width="16" height="16" rx="2"/>
+      <rect x="290" y="146" width="16" height="16" rx="2"/>
+      <rect x="310" y="146" width="16" height="16" rx="2"/>
+      <rect x="330" y="146" width="16" height="16" rx="2"/>
+      <rect x="350" y="146" width="16" height="16" rx="2"/>
+      <rect x="370" y="146" width="16" height="16" rx="2"/>
+      <rect x="390" y="146" width="16" height="16" rx="2"/>
+      <rect x="410" y="146" width="16" height="16" rx="2"/>
+      <rect x="270" y="166" width="16" height="16" rx="2"/>
+      <rect x="290" y="166" width="16" height="16" rx="2"/>
+      <rect x="310" y="166" width="16" height="16" rx="2"/>
+      <rect x="330" y="166" width="16" height="16" rx="2"/>
+      <rect x="350" y="166" width="16" height="16" rx="2"/>
+      <rect x="370" y="166" width="16" height="16" rx="2"/>
+      <rect x="390" y="166" width="16" height="16" rx="2"/>
+      <rect x="410" y="166" width="16" height="16" rx="2"/>
+      <rect x="270" y="186" width="16" height="16" rx="2"/>
+      <rect x="290" y="186" width="16" height="16" rx="2"/>
+      <rect x="310" y="186" width="16" height="16" rx="2"/>
+      <rect x="330" y="186" width="16" height="16" rx="2"/>
+      <rect x="350" y="186" width="16" height="16" rx="2"/>
+      <rect x="370" y="186" width="16" height="16" rx="2"/>
+      <rect x="390" y="186" width="16" height="16" rx="2"/>
+      <rect x="410" y="186" width="16" height="16" rx="2"/>
+      <rect x="270" y="206" width="16" height="16" rx="2"/>
+      <rect x="290" y="206" width="16" height="16" rx="2"/>
+      <rect x="310" y="206" width="16" height="16" rx="2"/>
+      <rect x="330" y="206" width="16" height="16" rx="2"/>
+      <rect x="350" y="206" width="16" height="16" rx="2"/>
+      <rect x="370" y="206" width="16" height="16" rx="2"/>
+      <rect x="390" y="206" width="16" height="16" rx="2"/>
+      <rect x="410" y="206" width="16" height="16" rx="2"/>
+      <rect x="270" y="226" width="16" height="16" rx="2"/>
+      <rect x="290" y="226" width="16" height="16" rx="2"/>
+      <rect x="310" y="226" width="16" height="16" rx="2"/>
+      <rect x="330" y="226" width="16" height="16" rx="2"/>
+      <rect x="350" y="226" width="16" height="16" rx="2"/>
+      <rect x="370" y="226" width="16" height="16" rx="2"/>
+      <rect x="390" y="226" width="16" height="16" rx="2"/>
+      <rect x="410" y="226" width="16" height="16" rx="2"/>
+    </g>
+    <text x="266" y="258" font-size="13" fill="#6a6e72">适合大量相同的小计算</text>
+
+    <text x="20" y="300" font-size="13" fill="#6a6e72">核的数量不是全部：数据供应和任务形状也会决定速度</text>
+  </g>
+</svg>
