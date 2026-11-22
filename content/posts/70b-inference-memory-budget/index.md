@@ -1,7 +1,7 @@
 ---
 title: "70B 模型推理的显存构成"
 date: "2026-11-22"
-description: "从权重和 KV cache 讲起，算清 32 个 4K 请求需要多少显存，以及 2 张还是 4 张 80GB 卡。"
+description: "从权重和 KV cache 讲起，算清 32 个 4K 请求需要多少显存，以及 2 张还是 4 张 80GB 卡够不够。"
 tags:
   - "GPU"
   - "推理"
@@ -70,7 +70,7 @@ KV cache 也不是按最大长度一次性整块分配。PagedAttention 把它�
 
 ![70B BF16 模型在 32 个 4K 请求下的显存构成](/images/inference-memory-stack.svg)
 
-## 两张卡为什么不够
+## 需要几张 80GB 卡
 
 把前面的数加起来，32 个 4K 请求大约需要 190～200GB：
 
