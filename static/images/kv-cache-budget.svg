@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">KV cache 由总 token 数决定</title>
+  <desc id="desc">32 个 4K 请求和 1 个 128K 请求都是 131072 个 token，KV cache 都约为 40 GiB。</desc>
+  <rect width="960" height="300" fill="#fbfbf8"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#1f2328">
+    <text x="32" y="42" font-size="22" font-weight="700">并发和上下文，花的是同一笔 KV 预算</text>
+    <text x="32" y="67" font-size="14" fill="#5b6573">KV cache ≈ 总 token 数 × 320 KiB；与请求怎么拆分无关</text>
+
+    <rect x="32" y="96" width="420" height="126" rx="8" fill="#ffffff" stroke="#e2e2dd"/>
+    <text x="56" y="128" font-size="16" font-weight="650">32 个并发请求</text>
+    <text x="56" y="158" font-size="14" fill="#5b6573">每个 4,096 token</text>
+    <text x="56" y="190" font-size="18" font-weight="650">131,072 token</text>
+    <text x="56" y="212" font-size="14" fill="#5b6573">约 40 GiB</text>
+
+    <rect x="508" y="96" width="420" height="126" rx="8" fill="#ffffff" stroke="#e2e2dd"/>
+    <text x="532" y="128" font-size="16" font-weight="650">1 个长上下文请求</text>
+    <text x="532" y="158" font-size="14" fill="#5b6573">单个 128K token</text>
+    <text x="532" y="190" font-size="18" font-weight="650">131,072 token</text>
+    <text x="532" y="212" font-size="14" fill="#5b6573">约 40 GiB</text>
+
+    <text x="32" y="266" font-size="14" fill="#5b6573">所以容量规划不能只看并发数，也不能只看最大上下文。</text>
+  </g>
+</svg>

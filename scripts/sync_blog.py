@@ -165,6 +165,17 @@ def convert_images(body: str) -> str:
     return pattern.sub(replace, body)
 
 
+def convert_attachment_paths(body: str) -> str:
+    pattern = re.compile(r"\]\((attachments/[^)\s]+)(\s+\"[^\"]*\")?\)")
+
+    def replace(match: re.Match) -> str:
+        target = match.group(1)[len("attachments/") :]
+        suffix = match.group(2) or ""
+        return f"](/images/{quote(target, safe='/')}{suffix})"
+
+    return pattern.sub(replace, body)
+
+
 def load_manifest() -> list[str]:
     if not MANIFEST.exists():
         return []
@@ -216,7 +227,7 @@ def sync(source: Path, check: bool) -> int:
         data, body = parse_front_matter(path.read_text(encoding="utf-8"))
         if data.get("publish") is not True:
             continue
-        body = convert_images(body)
+        body = convert_attachment_paths(convert_images(body))
         remaining = re.findall(r"\[\[([^\]]+)\]\]", body)
         if remaining:
             errors.append(f"{path.name}: unresolved wikilinks: {', '.join(remaining)}")

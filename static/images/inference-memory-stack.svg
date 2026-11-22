@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="title desc">
+  <title id="title">70B BF16 模型在 32 个 4K 请求下的显存构成</title>
+  <desc id="desc">权重约 140 GB，KV cache 约 43 GB，激活和框架开销合计约 10 到 20 GB，总显存约 190 到 200 GB。</desc>
+  <rect width="960" height="340" fill="#fbfbf8"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#1f2328">
+    <text x="32" y="42" font-size="22" font-weight="700">70B BF16，32 个 4K 请求的显存账</text>
+    <text x="32" y="67" font-size="14" fill="#5b6573">KV cache 按 BF16 计算；单位按 GPU 标称 GB 粗略折算</text>
+
+    <text x="32" y="116" font-size="15">weights</text>
+    <rect x="170" y="100" width="476" height="24" rx="4" fill="#0f5f6b"/>
+    <text x="658" y="117" font-size="15">140 GB</text>
+
+    <text x="32" y="157" font-size="15">KV cache</text>
+    <rect x="170" y="141" width="146" height="24" rx="4" fill="#6f9fa3"/>
+    <text x="328" y="158" font-size="15">约 43 GB（40 GiB）</text>
+
+    <text x="32" y="198" font-size="15">activations</text>
+    <rect x="170" y="182" width="24" height="24" rx="4" fill="#a9b6b4"/>
+    <text x="206" y="199" font-size="15">约 5～10 GB</text>
+
+    <text x="32" y="239" font-size="15">overhead</text>
+    <rect x="170" y="223" width="24" height="24" rx="4" fill="#c9c4b8"/>
+    <text x="206" y="240" font-size="15">约 5～10 GB，含 CUDA context、NCCL、CUDA graphs</text>
+
+    <line x1="32" y1="274" x2="928" y2="274" stroke="#e2e2dd" stroke-width="1"/>
+    <text x="32" y="305" font-size="16" font-weight="650">总显存约 190～200 GB</text>
+    <text x="32" y="326" font-size="13" fill="#5b6573">这是聚合量，不是单卡容量；4 卡 TP 时还要按 weights 和 KV cache 分片计算每卡占用。</text>
+  </g>
+</svg>
