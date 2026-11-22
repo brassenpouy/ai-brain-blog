@@ -55,7 +55,8 @@ body {
     font-size: 15px;
     line-height: 1.65;
     margin-top: 12px;
-    max-width: 62ch;
+    max-width: 100%;
+    text-wrap: pretty;
 }
 
 .post-meta {
