@@ -1,7 +1,7 @@
 ---
-title: "70B 模型推理要多少显存：140GB 只是权重"
+title: "70B 模型推理，显存到底花在哪"
 date: "2026-11-22"
-description: "以 Llama 3 70B 为例，把 weights、KV cache、激活和碎片分开算，判断 2 张还是 4 张 80GB GPU。"
+description: "140GB 只是权重，KV cache 和运行时开销才是变量。按 Llama 3 70B 算清 32 个 4K 请求需要多少显存，以及 2 张还是 4 张 80GB 卡。"
 tags:
   - "GPU"
   - "推理"
@@ -11,21 +11,17 @@ draft: false
 slug: "70b-inference-memory-budget"
 ---
 
-70B 模型推理要多少显存，很多人第一反应是 140GB。这个数只算了权重，KV cache、prefill 的临时 buffer 和框架开销都没进去。下面按 Llama 3 70B、BF16 把账算完，再看 2 张和 4 张 80GB 卡怎么选。
+## 1. 先看一个具体问题
 
-## 1. 结论
+假设手上有一台 2×80GB 的 GPU 机器，要服务 32 个用户，每个用户 4K 上下文。模型是 Llama 3 70B，BF16。
 
-70B BF16 模型的权重约 140 GB。32 个请求、每个 4K token 时，KV cache 约 40 GiB，折合约 43 GB。加上 prefill 激活、CUDA context、NCCL buffer、CUDA graphs 和碎片，总显存约 190～200 GB。
+先算权重：70B 参数，每个 2 字节，140GB。两张 80GB 卡一共 160GB，看起来能装下。
 
-两张 80GB 卡一共 160 GB，不够，常规选择是 4 张 80GB GPU 做 tensor parallelism。换成 FP8 权重后，70 GB 权重加 43 GB KV cache 和开销约 120 GB，两张 80GB 卡可以放下。
+但推理时显存不只放权重。KV cache、prefill 临时 buffer、CUDA context、通信 buffer 和碎片都要占地方。把 32 个 4K 请求放进去，总显存会到 190～200GB，2 张卡不够。
 
-这张图是 32 个 4K 请求的显存账：
+## 2. 显存花在哪
 
-![70B BF16 模型在 32 个 4K 请求下的显存构成](/images/inference-memory-stack.svg)
-
-## 2. 总账
-
-推理显存可以拆成五项：
+推理显存可以拆成五块：
 
 ```text
 total = weights + KV cache + activations/workspace
@@ -40,19 +36,21 @@ total = weights + KV cache + activations/workspace
 | overhead | 约 5～10 GB | CUDA context、NCCL、CUDA graphs |
 | fragmentation | 取决于 allocator | block size、最大长度、预留策略 |
 
-把显存想成一张桌子：weights 是模型本体，KV cache 是每个请求保留的上下文记录，activations 是临时草稿，overhead 是引擎自己占的位置。
+可以用一张桌子理解：weights 是模型本体，KV cache 是每个请求保留的上下文记录，activations 是临时草稿，overhead 是引擎自己占的位置。
+
+![70B BF16 模型在 32 个 4K 请求下的显存构成](/images/inference-memory-stack.svg)
 
 weights 基本固定。KV cache 会随着并发数和上下文长度涨。激活和框架开销占比不大，但很容易把“刚好够”变成“差一点”。
 
-## 3. 权重
+## 3. 第一块：权重
 
-Llama 3 70B 有 70B 参数。BF16 每个参数 2 字节：
+这是最容易算的一块。Llama 3 70B 有 70B 参数，BF16 每个参数 2 字节：
 
 ```text
 70B × 2 B = 140 GB
 ```
 
-不同精度的权重占用：
+换成其他精度：
 
 | 精度 | 权重大小 | 备注 |
 | --- | --- | --- |
@@ -62,7 +60,15 @@ Llama 3 70B 有 70B 参数。BF16 每个参数 2 字节：
 
 权重精度和 KV cache 精度是两件事。权重用 FP8，不代表 KV cache 也自动变成 FP8。
 
-## 4. KV cache
+## 4. 第二块：KV cache 是什么
+
+Attention 里，每个 token 会生成 Q、K、V。生成新 token 时，当前的 Q 要和前面所有 token 的 K 做匹配，再取对应的 V。
+
+如果每一步都重新算历史 K 和 V，开销会很大。推理引擎会把它们存下来，这就是 KV cache。
+
+每层都要存，每个 KV head 都要存。所以 KV cache 会随着层数、上下文长度和并发数增长。它像对话的工作记忆：聊得越久，记忆越大。
+
+## 5. KV cache 到底多大
 
 Llama 3 70B 的关键参数：
 
@@ -92,9 +98,9 @@ KV dtype = BF16
 
 并发数和上下文长度看着是两个参数，实际都在花同一笔 KV 预算。32 个 4K 用户和一个 128K 用户，总 token 数一样，KV cache 也一样。
 
-GQA 在这里很关键。Llama 3 70B 只有 8 个 KV heads。如果换成 64 个 KV heads 的 MHA，KV cache 会变成 8 倍，32 个 4K 请求需要约 320 GiB。仅这一项就足以改变 GPU 数量。
+GQA 在这里很关键。Llama 3 70B 只有 8 个 KV heads，多个 query heads 共享同一组 K/V。如果换成每个 query head 都有独立 KV 的 MHA，KV cache 会变成 8 倍，32 个 4K 请求需要约 320 GiB。仅这一项就足以改变 GPU 数量。
 
-## 5. 激活和框架开销
+## 6. 第三、四块：激活、开销和碎片
 
 decode 阶段每个请求每步只处理一个 token，激活不大。prefill 阶段处理整段 prompt，临时 buffer 会明显上升，长上下文时更明显。
 
@@ -109,15 +115,13 @@ vLLM 这类引擎会在启动时跑一次测试 forward，测出峰值后预留�
 
 vLLM 默认把 `gpu_memory_utilization` 设成 0.9，留下约 10% 余量。这部分余量用来吸收峰值和碎片，实际部署要留。
 
-## 6. 碎片
-
 如果按最大长度给每个请求预留一整块 KV，绝大多数位置会空着。并发一高，浪费很快放大。
 
 PagedAttention 把 KV cache 切成小块，按需分配。浪费主要落在每个请求的最后一个 block，不再是一整段最大长度。它解决的是 KV cache 内部碎片，不能消除 allocator 碎片和显存预留。
 
 因此实际可用显存总比标称值少。规划时把 80GB 当成 75GB 左右来算，更接近工程情况。
 
-## 7. 32 个 4K 请求要几张卡
+## 7. 把数带回去：2 张卡为什么不够
 
 聚合显存约 190～200 GB，直接看单卡容量：
 
@@ -133,9 +137,11 @@ PagedAttention 把 KV cache 切成小块，按需分配。浪费主要落在每�
 - KV cache：40 GiB ÷ 4 = 10 GiB/GPU。
 - 每卡还剩约 30 GB 给激活、通信 buffer、CUDA graphs 和碎片。
 
+2 张卡不够，原因也可以从每卡看：BF16 权重每卡 70 GB，KV cache 每卡 20 GiB，再加开销，已经超过 80GB。
+
 3 张 80GB 从总量看也可能放得下，但 Llama 3 70B 的 8 个 KV heads 不能被 3 整除，4-way TP 更自然。实际选型还要看 NVLink 拓扑、框架支持和并行策略。
 
-## 8. FP8 和 INT4 的边界
+## 8. 换精度，能不能压到 2 张卡
 
 FP8 权重把固定成本从 140 GB 降到 70 GB。2 卡 BF16 放不下的 70B，在 FP8 下可以变成 2 卡部署：
 
@@ -162,16 +168,16 @@ INT4 权重约 35 GB，看起来更省，但还要算 scales、dequant 开销和
 - prefill 与 decode 的配比。
 - KV cache 的读写效率。
 
-## 10. 怎么定卡数
+## 10. 实际估算按这个顺序
 
 先把账分清楚：weights 基本固定，KV cache 随总 token 数增长，显存预算要按最坏情况留。
 
-拿上面的例子：
+1. 算 weights：参数量 × 每参数字节数。
+2. 定最坏情况：并发数 × 最大上下文长度。
+3. 算 KV cache：总 token 数 × 每 token 的 KV 大小。
+4. 加激活、框架开销和碎片，给 10% 左右余量。
+5. 按单卡可用容量拆卡，再用目标引擎和真实请求分布做 profile。
 
-- 70B BF16 权重约 140 GB。
-- Llama 3 70B 的 KV cache 约 320 KiB/token。
-- 32 个 4K 请求约 40 GiB KV cache。
-- 加激活、框架开销和碎片，总额约 190～200 GB。
-- BF16 需要 4×80GB，FP8 可以压到 2×80GB。
+拿上面的例子：70B BF16 权重约 140 GB，KV cache 约 320 KiB/token，32 个 4K 请求约 40 GiB，加开销后总额约 190～200 GB。BF16 需要 4×80GB，FP8 可以压到 2×80GB。
 
 这些只是容量估算，真实部署要用目标引擎和实际请求分布做 profile。长上下文 prefill、KV 量化和 tensor parallel 拓扑都会改变结果。
