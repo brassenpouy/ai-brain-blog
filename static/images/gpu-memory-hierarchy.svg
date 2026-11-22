@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">GPU 的内存层次</title>
+  <desc id="desc">寄存器最快最小，shared memory 和 L1 次之，L2 更大，HBM 显存容量最大但带宽有限。</desc>
+  <rect width="480" height="300" fill="#f8f7f4"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,PingFang SC,Microsoft YaHei,sans-serif" fill="#202326">
+    <text x="20" y="30" font-size="20" font-weight="700">GPU 的数据放在哪</text>
+    <text x="20" y="51" font-size="14" fill="#6a6e72">越靠近计算单元，越快也越小</text>
+
+    <rect x="70" y="78" width="390" height="40" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="70" y="78" width="6" height="40" rx="3" fill="#2f5d60"/>
+    <text x="90" y="104" font-size="15" font-weight="600">寄存器 registers</text>
+    <text x="442" y="104" font-size="13" fill="#6a6e72" text-anchor="end">每线程私有 · 最快最小</text>
+
+    <rect x="70" y="126" width="390" height="40" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="70" y="126" width="6" height="40" rx="3" fill="#7faaa7"/>
+    <text x="90" y="152" font-size="15" font-weight="600">shared memory + L1</text>
+    <text x="442" y="152" font-size="13" fill="#6a6e72" text-anchor="end">一个 SM 内共享</text>
+
+    <rect x="70" y="174" width="390" height="40" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="70" y="174" width="6" height="40" rx="3" fill="#b3c2bf"/>
+    <text x="90" y="200" font-size="15" font-weight="600">L2 cache</text>
+    <text x="442" y="200" font-size="13" fill="#6a6e72" text-anchor="end">整个 GPU 共享</text>
+
+    <rect x="70" y="222" width="390" height="40" rx="5" fill="#fdfdfb" stroke="#e4e1d9"/>
+    <rect x="70" y="222" width="6" height="40" rx="3" fill="#ccc6ba"/>
+    <text x="90" y="248" font-size="15" font-weight="600">HBM 显存</text>
+    <text x="442" y="248" font-size="13" fill="#6a6e72" text-anchor="end">容量最大 · 带宽有限</text>
+
+    <text x="20" y="286" font-size="13" fill="#6a6e72">数据搬得越远，等待越久</text>
+  </g>
+</svg>
