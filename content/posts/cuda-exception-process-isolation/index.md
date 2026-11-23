@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-23"
-lastmod: "2026-11-23T23:48:48+08:00"
+lastmod: "2026-11-23T23:50:21+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -183,6 +183,28 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 CUDA runtime 是应用能看到的接口层；真正决定隔离能力的是 driver、kernel driver、firmware 和硬件。硬件不能提供 per-channel 或 per-VMID 的错误归因时，软件只能做到“事后杀进程”，不能保证其他进程完全不受影响。
 
 MPS 又特殊一层：MPS server 是用户态进程，但 fault containment 依赖 driver 和后续 context 重建。MIG 则把隔离边界下移到硬件分区，但配置、IPC 和 reset 仍要 NVML/driver 配合。
+
+### KMD 层的处理
+
+KMD 负责把硬件 fault 变成进程或 context 级事件。以 NVIDIA 为例，就是 `nvidia.ko`、`nvidia-uvm.ko` 这些内核模块。
+
+**fault 归因。** 硬件上报 fault 时通常带 VMID、channel、engine、fault buffer 信息。KMD 要把 VMID/channel 映射到进程、context 和用户态 driver 实例。映射不准，后面的隔离和清理都会错。
+
+**channel 和 VM 拆除。** 责任进程发生 fatal fault 后，KMD 要停止该 channel 的新提交，抢占或 drain 在途工作，等待 fence，释放 GPU VA、页表、队列和 semaphore，再销毁 context。其他 channel 不能因为这次拆除被误伤。
+
+**page fault 和 UVM。** MMU fault 分可重放和不可重放。合法缺页交给 UVM 迁移或映射；非法地址、权限错误和 fault storm 要终止责任进程，同时避免阻塞其他进程的 fault 处理队列。
+
+**interrupt 和 reset。** fault interrupt 不能直接在中断上下文里做重活；KMD 通常把清理和 reset 放到 workqueue。reset 要区分 channel、engine、GPU、MIG instance 和 VF/FLR。进程级错误不应触发整卡 reset；硬件级 fatal fault 才升级到设备复位。
+
+**进程退出。** `close(fd)`、`exit_mmap`、`kill -9` 和 ioctl 并发发生时，KMD 要保证引用计数、对象生命周期和清理顺序正确。进程已经退出，但 interrupt 还在引用它的 channel，是最典型的 use-after-free 场景。
+
+**内存和 IPC。** GPU VA、pin 住的页、DMA mapping、P2P mapping、CUDA IPC handle 都要在 fault domain 销毁时回收。一个进程退出不能留下其他进程可访问的残留映射。
+
+**MIG / SR-IOV。** KMD 要识别 GI/CI 或 VF 的归属，reset 只作用于责任实例；跨实例 IPC 和错误上报要明确。设备级错误仍可能穿透分区，不能承诺无限隔离。
+
+**遥测和 RAS。** Xid、ECC、fault buffer、PID、VMID、device ID 要进日志和 telemetry，但不要泄露其他进程的地址或 handle。
+
+KMD 的核心约束是：进程级 fault 不能升级成全局 reset；设备级 fatal 必须明确升级；所有拆路径都要可重入、可并发、可清理。
 
 ## 测试场景
 
