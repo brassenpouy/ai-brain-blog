@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-22"
-lastmod: "2026-11-23T21:27:00+08:00"
+lastmod: "2026-11-23T21:39:00+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -144,6 +144,24 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 - `cudaDeviceReset` 仍只作用于当前进程的当前设备。
 - MPS/MIG 模式下的错误码、server 状态和 IPC 行为要逐项写清。
 - fork、多线程、多个 context、driver/runtime 混用都要覆盖。
+
+## 开发难点
+
+**错误归因。** GPU 错误是异步上报的。CUDA API 可能在后一次调用才返回前一个 kernel 的错误；MPS 对非内存类 fatal fault 不指出具体 client；Xid 是驱动日志，不天然带 PID 和 context。要把异常限制到进程，driver 必须维护 process、context、channel、queue 和 fault event 的对应关系。
+
+**故障域恢复。** CUDA fatal execution error 不是“清一个错误码”就能恢复。`cudaErrorIllegalAddress`、`cudaErrorAssert`、`cudaErrorLaunchFailure` 都要求进程终止。隔离功能要决定是杀进程、销毁 context，还是重建 MPS client group；每种动作的资源清理边界不同。
+
+**在途工作。** 异常发生时可能还有 kernel、async copy、DMA、fence、event 和 graph 在执行。直接杀进程会留下悬挂队列、未完成 fence 和 IPC handle。driver 需要先停止新提交，再取消或 drain 旧工作，最后回收 VA、内存、队列和事件。
+
+**MPS 的共享状态。** MPS client 有独立地址空间，但共享 MPS server 和 GPU 子集。一个 client 的 fatal fault 会让 server 进入 `FAULT`，影响共享同一 GPU 的多个 client；非内存 fault 还不一定指出责任方。想在这个拓扑上做 per-process 隔离，必须改 MPS 的故障处理和归因链路。
+
+**MIG 的粒度。** MIG 有实例级 error isolation，但配置受 profile 限制，跨分区 IPC 受限，也不能把一个进程的异常轻量地隔离成子分区。隔离功能要识别 MIG 拓扑，避免把设备级故障误判成进程级故障。
+
+**跨 feature 状态。** Unified Memory 的 page fault、CUDA Graphs 的私有内存池、IPC/P2P 的共享 handle、NCCL 的通信域，都有独立生命周期。异常清理要覆盖这些对象，否则进程退出后仍会留下脏状态。
+
+**兼容性和性能。** 每个 CUDA 版本、驱动版本、MPS/MIG 配置和容器环境都要保持错误码和 API 行为一致。隔离路径还会增加跟踪、fence 和清理开销，不能把正常路径拖慢。
+
+**安全边界。** 恶意进程可以主动触发 fault。隔离功能要保证它不能借异常影响其他租户，也不能通过错误信息、handle 或 telemetry 泄露其他进程的数据。
 
 ## 测试场景
 
