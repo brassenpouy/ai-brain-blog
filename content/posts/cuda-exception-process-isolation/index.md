@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-22"
-lastmod: "2026-11-23T21:39:00+08:00"
+lastmod: "2026-11-23T21:41:22+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -162,6 +162,25 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 **兼容性和性能。** 每个 CUDA 版本、驱动版本、MPS/MIG 配置和容器环境都要保持错误码和 API 行为一致。隔离路径还会增加跟踪、fence 和清理开销，不能把正常路径拖慢。
 
 **安全边界。** 恶意进程可以主动触发 fault。隔离功能要保证它不能借异常影响其他租户，也不能通过错误信息、handle 或 telemetry 泄露其他进程的数据。
+
+## 涉及哪些软件栈模块
+
+这个 feature 不能只做在 CUDA runtime。最小闭环要跨 user-space driver、kernel driver、firmware 和硬件；MPS/MIG 还要各自处理。
+
+| 模块 | 负责什么 | feature 需要改什么 |
+| --- | --- | --- |
+| CUDA runtime | API 语义、错误码、context 初始化、`cudaDeviceReset` | 保持错误可见性和进程退出行为；通常不负责真正的隔离 |
+| CUDA driver（user space） | context、stream、queue、channel、IPC、UVM、CUDA Graph | fault domain、错误归因、资源清理、MPS 接口 |
+| kernel driver | 中断、MMU fault、channel teardown、reset、Xid | 故障路由、进程退出处理、设备隔离 |
+| firmware / GSP | 调度、engine reset、异常上报 | 故障范围、reset 范围、上报格式 |
+| GPU 硬件 | VMID、channel、engine、MMU、MIG 分区 | per-process 故障归因和隔离能力 |
+| MPS | 共享 server、client、GPU 子集 | client 故障组、责任方归因、server `FAULT` 恢复 |
+| MIG / NVML | GI/CI 分区、拓扑、遥测 | 识别隔离边界、分区 reset、错误上报 |
+| 容器 / K8s | 进程生命周期、设备分配、重启 | 故障进程清理、设备重新调度、状态回收 |
+
+CUDA runtime 是应用能看到的接口层；真正决定隔离能力的是 driver、kernel driver、firmware 和硬件。硬件不能提供 per-channel 或 per-VMID 的错误归因时，软件只能做到“事后杀进程”，不能保证其他进程完全不受影响。
+
+MPS 又特殊一层：MPS server 是用户态进程，但 fault containment 依赖 driver 和后续 context 重建。MIG 则把隔离边界下移到硬件分区，但配置、IPC 和 reset 仍要 NVML/driver 配合。
 
 ## 测试场景
 
