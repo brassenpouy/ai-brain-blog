@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-23"
-lastmod: "2026-11-23T21:41:22+08:00"
+lastmod: "2026-11-23T23:43:07+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -62,6 +62,8 @@ MPS 经常被当成多进程隔离方案。它让多个进程共享 GPU，并给
 - client 未同步就异常退出，可能让 MPS server 和其他 client 进入未定义状态，出现挂起、异常失败或数据损坏。
 
 MIG 文档的对比表把 MPS 的 Error Isolation 标为 `No`。这里的 `No` 指没有 MIG 那种按实例的 error isolation；MPS 仍有有限的 fault containment。对“exception 进程隔离”来说，MPS 是需要纳入设计的共享拓扑，不能作为隔离保证。
+
+Reddit r/CUDA 的一条 [GPU 分片讨论](https://www.reddit.com/r/CUDA/comments/1v0cqot/how_we_do_fractional_gpu_slicing_without_nvidia/) 也提到，MPS 下一个进程的 invalid memory access 会影响整个 MPS server 和其 client context。这和官方文档的 limited containment 是一致的：地址空间独立，不等于错误隔离。
 
 ### MIG
 
