@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-23"
-lastmod: "2026-11-23T23:45:16+08:00"
+lastmod: "2026-11-23T23:46:38+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -198,6 +198,20 @@ MPS 又特殊一层：MPS server 是用户态进程，但 fault containment 依�
 | MIG fatal fault | 不同 GI/CI | 分区隔离；跨分区 IPC 行为明确 |
 | Xid / ECC | 整卡 | 按设备级错误升级；不能假装进程级隔离 |
 | 进程被 kill -9 | 多进程 | 资源回收；无残留 channel/fence |
+
+### 怎么触发异常
+
+构造特定 kernel 是最直接的办法，但只覆盖 device execution 这一层。
+
+| 注入方式 | 例子 | 触发层次 |
+| --- | --- | --- |
+| kernel trap | `assert(0)`、`__trap()`、非法地址访问 | 设备执行异常 |
+| launch / API | 资源超限、OOM、无效 handle | API 或 launch 错误，不一定产生 device exception |
+| 系统 / 硬件 | `kill -9`、hang/timeout、Xid/ECC 注入 | 进程或设备级故障 |
+
+测试不要只用一个必崩 kernel。故障点要参数化：idle、kernel 执行中、async copy 中、Graph launch 中、fence 等待中。不同故障点决定是否还有在途工作、是否会留下悬挂队列，也决定故障域清理的难度。
+
+构造 kernel 时优先用 `assert`、trap 和非法地址，不要用未定义指令或故意破坏硬件。`CUDA_LAUNCH_BLOCKING=1` 只适合定位，不用于并发测试。`compute-sanitizer` 用来找非法访存，不要和故意注入的 fault 同时跑。
 
 ### MPS 的 blast radius
 
