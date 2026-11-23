@@ -1,6 +1,7 @@
 ---
 title: "GPU 并行计算：从 1,024 道乘法题说起"
 date: "2026-11-22"
+lastmod: "2026-11-22T19:17:21+08:00"
 description: "从 1,024 道乘法题讲起，解释 warp、shared memory、tiling 和显存带宽，最后看 GPU 为什么跑不满峰值。"
 tags:
   - "GPU"

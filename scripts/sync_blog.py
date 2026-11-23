@@ -108,6 +108,7 @@ def yaml_string(value) -> str:
 def render_post(data: dict, body: str, path: Path) -> str:
     title = str(data.get("title") or path.stem)
     date = str(data.get("date") or datetime.fromtimestamp(path.stat().st_mtime).strftime("%Y-%m-%d"))
+    lastmod = str(data.get("lastmod") or date)
     description = str(data.get("description") or "")
     tags = as_list(data.get("tags"))
     slug = slugify(str(data.get("slug") or title))
@@ -116,6 +117,7 @@ def render_post(data: dict, body: str, path: Path) -> str:
         "---",
         f"title: {yaml_string(title)}",
         f"date: {yaml_string(date)}",
+        f"lastmod: {yaml_string(lastmod)}",
         f"description: {yaml_string(description)}",
         "tags:",
     ]

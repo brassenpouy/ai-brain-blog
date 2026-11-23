@@ -1,6 +1,7 @@
 ---
 title: "MoE 与循环 Transformer：架构跟着硬件走"
 date: "2026-11-22"
+lastmod: "2026-11-22T21:05:40+08:00"
 description: "从一条 x.com 帖子出发，先解释参数、token、batch 和显存，再看 MoE 和 looped transformer 为什么适合不同硬件。"
 tags:
   - "AI 架构"

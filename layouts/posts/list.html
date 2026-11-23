@@ -1,5 +1,5 @@
 {{ define "main" }}
-{{ $paginator := .Paginate .RegularPages }}
+{{ $paginator := .Paginate (.RegularPages.ByLastmod.Reverse) }}
 
 <header class="list-header">
   <h1 class="list-title">{{ .Title }}</h1>

@@ -1,6 +1,7 @@
 ---
 title: "大模型 API trace 的 capture 与 replay"
 date: "2026-11-22"
+lastmod: "2026-11-22T21:15:10+08:00"
 description: "从 HTTP 请求、token 序列到 CUDA API/kernel 和 CUDA Graph，解释 trace 抓取与重放的原理、做法和边界。"
 tags:
   - "LLM"

@@ -1,5 +1,6 @@
 {{ define "main" }}
 {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{ $pages = $pages.ByLastmod.Reverse }}
 <div class="home-layout">
   <div class="home-main">
     <section class="home-hero">

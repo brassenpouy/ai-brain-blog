@@ -1,7 +1,8 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-22"
-description: "面向 CUDA 兼容 GPU 软件栈，梳理 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收矩阵。"
+lastmod: "2026-11-23T21:27:00+08:00"
+description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收矩阵。"
 tags:
   - "CUDA"
   - "进程隔离"
@@ -60,7 +61,7 @@ MPS 经常被当成多进程隔离方案。它让多个进程共享 GPU，并给
 - 其他 GPU 上的 client 不受影响。
 - client 未同步就异常退出，可能让 MPS server 和其他 client 进入未定义状态，出现挂起、异常失败或数据损坏。
 
-MIG 文档的对比表把 MPS 的 Error Isolation 标为 `No`。这里的 `No` 指没有 MIG 那种按实例的 error isolation；MPS 仍有有限的 fault containment。对“exception 进程隔离”来说，MPS 是需要兼容的共享拓扑，不能作为隔离保证。
+MIG 文档的对比表把 MPS 的 Error Isolation 标为 `No`。这里的 `No` 指没有 MIG 那种按实例的 error isolation；MPS 仍有有限的 fault containment。对“exception 进程隔离”来说，MPS 是需要纳入设计的共享拓扑，不能作为隔离保证。
 
 ### MIG
 
@@ -134,7 +135,7 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 
 设备级 fatal error 不能走这条路径。必须明确升级条件，避免把“进程隔离”误宣传成“硬件故障隔离”。
 
-### CUDA 兼容性
+### CUDA API 语义
 
 隔离功能不能改变 CUDA API 的既有语义：
 
@@ -167,7 +168,7 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 - 错误归因准确率：PID、context、device、Xid 能对应到故障源。
 - 资源回收：VA、内存、队列、event、graph、IPC handle 无泄漏。
 - 恢复时间：故障进程退出到新请求可服务的耗时。
-- CUDA 兼容性：错误码和 API 行为与基线一致。
+- API 语义：错误码和 API 行为与基线一致。
 - 性能开销：正常路径的提交、同步和显存开销可测。
 - 长稳：反复故障注入后没有死锁、悬挂 fence 或 server 状态卡死。
 
@@ -181,4 +182,4 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 
 **“`cudaDeviceReset` 会重置整张 GPU。”** 它只清理当前进程、当前设备的 CUDA 状态；不能修复其他进程或硬件。
 
-`exception 进程隔离` 要解决的是：把错误限制在明确的 fault domain 内，同时保持 CUDA API 兼容、资源可回收、错误可归因。只做异常捕获，不算进程隔离。
+`exception 进程隔离` 要解决的是：把错误限制在明确的 fault domain 内，同时保持 CUDA API 语义一致、资源可回收、错误可归因。只做异常捕获，不算进程隔离。
