@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-23"
-lastmod: "2026-11-23T23:46:38+08:00"
+lastmod: "2026-11-23T23:48:48+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -212,6 +212,34 @@ MPS 又特殊一层：MPS server 是用户态进程，但 fault containment 依�
 测试不要只用一个必崩 kernel。故障点要参数化：idle、kernel 执行中、async copy 中、Graph launch 中、fence 等待中。不同故障点决定是否还有在途工作、是否会留下悬挂队列，也决定故障域清理的难度。
 
 构造 kernel 时优先用 `assert`、trap 和非法地址，不要用未定义指令或故意破坏硬件。`CUDA_LAUNCH_BLOCKING=1` 只适合定位，不用于并发测试。`compute-sanitizer` 用来找非法访存，不要和故意注入的 fault 同时跑。
+
+### CUDA runtime / driver 注入
+
+API 层的 exception 大多是错误返回值。它们适合测参数校验、资源生命周期和 context 语义，但不能都当成 fatal device exception。
+
+| 类别 | Runtime 侧 | Driver 侧 | 典型结果 |
+| --- | --- | --- | --- |
+| 无效设备 / 参数 | `cudaSetDevice(-1)`、非法枚举值 | `cuCtxCreate` 传非法 flags | `cudaErrorInvalidDevice` / `CUDA_ERROR_INVALID_VALUE` |
+| 无效 handle | 重复销毁 stream/event、使用已销毁对象 | 重复 `cuCtxDestroy`、非法 module | `cudaErrorInvalidResourceHandle` / `CUDA_ERROR_INVALID_HANDLE` |
+| launch 配置 | grid/block 为 0、线程或 shared memory 超限 | `cuLaunchKernel` 参数不合法 | `cudaErrorInvalidConfiguration` / `LaunchOutOfResources`，context 通常还能用 |
+| 显存不足 | 申请超大 buffer | `cuMemAlloc` 超大请求 | `cudaErrorMemoryAllocation` / `CUDA_ERROR_OUT_OF_MEMORY`，释放后可恢复 |
+| context 生命周期 | `cudaDeviceReset` 后继续调用 | `cuCtxDestroy` 后使用 context | `cudaErrorContextIsDestroyed` / `CUDA_ERROR_CONTEXT_IS_DESTROYED` |
+| stream / event | 销毁后继续 wait、非法 event 顺序 | `cuStreamWaitEvent` 非法 handle | 资源错误；是否有在途工作决定清理复杂度 |
+| Graph / capture | 非法节点、capture 中同步、exec update 不匹配 | `cuGraph*` 非法依赖或实例化失败 | capture / graph 错误，通常只影响当前 context |
+| module / PTX | N/A | 加载坏 cubin/PTX、找不到函数 | `CUDA_ERROR_INVALID_IMAGE` / `INVALID_PTX` |
+| IPC / UVM | 非法 IPC handle、跨设备映射 | `cuIpcOpenMemHandle` 非法 handle | 跨进程资源错误，清理不完整会留下脏 handle |
+| 异步 fatal | kernel 非法地址在后续 sync 才返回 | `cuCtxSynchronize` 收到 launch failure | `cudaErrorIllegalAddress` / `CUDA_ERROR_LAUNCH_FAILED`，进程须终止 |
+| MPS | server `FAULT` 时新建 client | 连接 MPS server 失败 | `CUDA_ERROR_MPS_SERVER_NOT_READY`，按 MPS client group 处理 |
+
+关键区别是“调用返回错误”与“context 已污染”。无效参数、launch 配置、OOM 通常是可恢复的；非法地址、assert、launch failure 是 fatal，必须在故障进程内终止并重建 context。
+
+测试时把两类分开断言：
+
+- 可恢复错误：同一 context 修复参数后还能继续工作。
+- fatal 错误：责任进程退出或 context 被销毁；其他进程不受影响。
+- 跨进程错误：IPC handle、MPS server、UVM page fault 要检查资源回收和对端状态。
+
+`cudaGetLastError` 和 `cudaPeekAtLastError` 的清除语义不同，测试要避免一个用例把另一个用例的错误吞掉。
 
 ### MPS 的 blast radius
 
