@@ -1,6 +1,6 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
-date: "2026-11-22"
+date: "2026-11-23"
 lastmod: "2026-11-23T21:41:22+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
