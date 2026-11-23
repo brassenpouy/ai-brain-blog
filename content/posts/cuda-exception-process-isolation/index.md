@@ -2,7 +2,7 @@
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-22"
 lastmod: "2026-11-23T21:27:00+08:00"
-description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收矩阵。"
+description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
   - "进程隔离"
@@ -142,10 +142,10 @@ MPS 目前对非内存类 fatal fault 不一定能指出具体 client。新 feat
 - 致命错误在故障进程内仍应表现为对应的 CUDA 错误。
 - `cudaGetLastError` / `cudaPeekAtLastError` 的可见性不应跨进程串扰。
 - `cudaDeviceReset` 仍只作用于当前进程的当前设备。
-- MPS/MIG 模式下的错误码、server 状态和 IPC 行为要有明确矩阵。
+- MPS/MIG 模式下的错误码、server 状态和 IPC 行为要逐项写清。
 - fork、多线程、多个 context、driver/runtime 混用都要覆盖。
 
-## 测试矩阵
+## 测试场景
 
 | 故障 | 拓扑 | 期望 |
 | --- | --- | --- |
