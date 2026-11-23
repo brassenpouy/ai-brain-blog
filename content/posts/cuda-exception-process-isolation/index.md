@@ -1,7 +1,7 @@
 ---
 title: "CUDA exception 进程隔离：边界、交互和测试"
 date: "2026-11-23"
-lastmod: "2026-11-23T23:43:07+08:00"
+lastmod: "2026-11-23T23:45:16+08:00"
 description: "梳理 CUDA 中 exception 进程隔离的错误层级、context/MPS/MIG 边界、相关 feature 交互和验收标准。"
 tags:
   - "CUDA"
@@ -198,6 +198,20 @@ MPS 又特殊一层：MPS server 是用户态进程，但 fault containment 依�
 | MIG fatal fault | 不同 GI/CI | 分区隔离；跨分区 IPC 行为明确 |
 | Xid / ECC | 整卡 | 按设备级错误升级；不能假装进程级隔离 |
 | 进程被 kill -9 | 多进程 | 资源回收；无残留 channel/fence |
+
+### MPS 的 blast radius
+
+MPS 测试不能只断言“故障 client 退出”。要按拓扑定义受影响集合：
+
+- 同 GPU 子集内的 client 是否收到 fatal error。
+- 其他 GPU 上的 client 是否继续运行。
+- MPS server 是否进入 `FAULT`，新 client 是否收到 `CUDA_ERROR_MPS_SERVER_NOT_READY`。
+- 受影响 client 全部退出后，server 是否回到 `ACTIVE`，新 client 能否正常创建 context。
+- 非内存 fatal fault 是否仍然不指出责任 client；如果产品承诺进程级归因，这里就是缺口。
+
+测试 harness 要记录每个 client 的 PID、context、device、错误码和存活状态。故障注入覆盖 idle、kernel 执行中、async copy 中、Graph launch 中，以及 `kill -9`、assert、illegal address、OOM。并发触发两个 client 的异常，观察 server 状态和恢复路径。
+
+MPS 的校验目标不是一个进程的退出码，而是 blast radius：哪些 client 应该受影响、哪些必须存活、server 如何恢复、新请求何时可以重新进入。这个用例也可以作为进程隔离 feature 的负向基线：如果 feature 声称隔离 MPS client，这个场景必须通过；如果做不到，就要在支持矩阵里明确。
 
 还要做并发和压力测试：两个进程同时触发异常、异常和 reset 竞争、反复创建销毁 context、MPS server 反复进入 `FAULT`、容器重启、长时间 soak。隔离功能最容易在竞态和清理路径上出问题。
 
