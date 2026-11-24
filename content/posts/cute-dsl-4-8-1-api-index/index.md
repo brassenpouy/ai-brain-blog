@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
-date: "2026-11-24T21:28:21+08:00"
-lastmod: "2026-11-24T21:39:40+08:00"
+date: "2026-11-24T21:41:30+08:00"
+lastmod: "2026-11-24T21:41:30+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -17,9 +17,9 @@ slug: "cute-dsl-4-8-1-api-index"
 
 覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及有明确导出的 experimental 模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
 
-共 59 个模块或命名空间，1329 个导出项。索引按模块和完全限定名组织；跨模块同名项不按字符串合并，规则见下。每节内部只合并重复字符串：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，合并后 162 项。
+共 67 个模块或命名空间，1477 个导出项。索引按模块和完全限定名组织；跨模块同名项不按字符串合并，规则见下。每节内部只合并重复字符串：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，合并后 162 项。
 
-不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 一节只列基础类型；`cutlass` 顶层的控制流、编译配置和 `cutlass_dsl` 入口不在本页展开。Task Scheduling 子模块按 4.8.1 文档拆开列出。`cutlass.cute.experimental` 中未统一导出的内部子模块也不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
+不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 一节只列基础类型；`cutlass` 顶层的控制流、编译配置和 `cutlass_dsl` 入口不在本页展开。Task Scheduling 子模块按 4.8.1 文档拆开列出。`cutlass.cute.experimental` 的公开子模块已单列；可选 `iket` 组件不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
 
 ## 去重规则
 
@@ -196,6 +196,37 @@ RoundingMode, rsqrt, sin, sincos, sinh, sqrt, sub, tan, tanh, trunc
 ```text
 Band, PALETTES, print_latex, print_latex_tv, tikz_color_rainbow
 tikz_color_tv, tikz_escape
+```
+
+### cutlass.cute.experimental（78）
+
+```text
+AccumulatorBufferingKind, AccumulatorBufferingPlan, AccumulatorDrain
+AccumulatorOverlapPolicy, allocate, AllocationRequirement
+AsyncToUMMAPipeline, b32_payload, B32PayloadCodec
+circular_buffer_pipeline_advance_iterator
+circular_buffer_pipeline_consume
+circular_buffer_pipeline_consumer_release, CircularBufferPipelineState
+CLCPipeline, ClusterMailbox, compile, consumer_release
+consumer_release_elect_one_sync, consumer_tail, consumer_try_wait
+consumer_wait, copy, create_circular_buffer_pipeline, create_pipeline
+create_pipeline_state_at, create_pipeline_with_mask, dot
+dot_block_scaled, dot_sparse, elect_sync, elementwise, epilogue_tma_store
+GenericPipeline, GenericPipelineBase, get_arrival_count, get_cta_v_map_ab
+get_cta_v_map_c, get_mbarrier, get_pipeline_consume_phase
+get_pipeline_consume_stage, get_pipeline_produce_phase
+get_pipeline_produce_stage, GroupedGemmSchedulerPipeline
+is_preferred_cluster, jit, kernel, mainloop_mma, mainloop_mma_sm120
+make_t2r_rmem_layout, make_tmem_layout_a, make_tmem_layout_acc
+mbarrier_expect_tx, MbarrierOwner, normalize_skip_wait_token, partition
+partition_and_copy, pipeline_advance_iterator, pipeline_tail
+PipelineLocale, PipelineState, plan_accumulator_buffering
+predicated_tensor_origin, producer_acquire, producer_commit
+producer_try_acquire, QueryDeviceWorkspaceFunc, simt_auto_vec_copy
+tma_load, tma_load_multicast, tma_reduce_store, tma_store
+TMAStorePipeline, TMAToAsyncPipeline, TMAToUMMACircularPipeline
+TMAToUMMAPipeline, TmemAllocationRequest, UMMAtoAsyncPipeline
+warp_reduce
 ```
 
 ### cutlass.cute.arch（162）
@@ -685,4 +716,64 @@ b32_payload, B32PayloadCodec, ClusterMailbox, CTA_PAIR_PEER_LOCALE
 
 ```text
 AllocationRequirement, QueryDeviceWorkspaceFunc
+```
+
+### cutlass.cute.experimental.accumulator_buffering（6）
+
+```text
+AccumulatorBufferingKind, AccumulatorBufferingPlan, AccumulatorDrain
+AccumulatorOverlapPolicy, plan_accumulator_buffering
+TmemAllocationRequest
+```
+
+### cutlass.cute.experimental.algorithm（6）
+
+```text
+elementwise, partition, partition_and_copy, predicated_tensor_origin
+simt_auto_vec_copy, warp_reduce
+```
+
+### cutlass.cute.experimental.core（30）
+
+```text
+circular_buffer_pipeline_advance_iterator
+circular_buffer_pipeline_consume
+circular_buffer_pipeline_consumer_release, CircularBufferPipelineState
+consumer_release, consumer_release_elect_one_sync, consumer_tail
+consumer_try_wait, consumer_wait, create_circular_buffer_pipeline
+create_pipeline, create_pipeline_state_at, create_pipeline_with_mask
+elect_sync, get_arrival_count, get_mbarrier, get_pipeline_consume_phase
+get_pipeline_consume_stage, get_pipeline_produce_phase
+get_pipeline_produce_stage, mbarrier_expect_tx, MbarrierOwner
+normalize_skip_wait_token, pipeline_advance_iterator, pipeline_tail
+PipelineLocale, PipelineState, producer_acquire, producer_commit
+producer_try_acquire
+```
+
+### cutlass.cute.experimental.math（3）
+
+```text
+dot, dot_block_scaled, dot_sparse
+```
+
+### cutlass.cute.experimental.memory（6）
+
+```text
+allocate, copy, tma_load, tma_load_multicast, tma_reduce_store, tma_store
+```
+
+### cutlass.cute.experimental.pipeline（10）
+
+```text
+AsyncToUMMAPipeline, CLCPipeline, GenericPipeline, GenericPipelineBase
+GroupedGemmSchedulerPipeline, TMAStorePipeline, TMAToAsyncPipeline
+TMAToUMMACircularPipeline, TMAToUMMAPipeline, UMMAtoAsyncPipeline
+```
+
+### cutlass.cute.experimental.utils（9）
+
+```text
+epilogue_tma_store, get_cta_v_map_ab, get_cta_v_map_c
+is_preferred_cluster, mainloop_mma, mainloop_mma_sm120
+make_t2r_rmem_layout, make_tmem_layout_a, make_tmem_layout_acc
 ```
