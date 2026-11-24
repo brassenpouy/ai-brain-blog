@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1：使用场景、API 分类与工程边界"
-date: "2026-11-23"
-lastmod: "2026-11-24T21:07:23+08:00"
+date: "2026-11-24"
+lastmod: "2026-11-24T21:09:30+08:00"
 description: "基于 4.8.1 文档和源码，整理 CuTe DSL 的适用场景、最小工作流、对外 API 分类，以及 GitHub issue 暴露的工程边界。"
 tags:
   - "CUTLASS"
