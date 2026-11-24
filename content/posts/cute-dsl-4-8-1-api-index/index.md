@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
 date: "2026-11-24T21:41:30+08:00"
-lastmod: "2026-11-24T21:48:03+08:00"
+lastmod: "2026-11-24T21:56:20+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -20,6 +20,22 @@ slug: "cute-dsl-4-8-1-api-index"
 共 67 个模块或命名空间，1478 个导出项。索引按模块和完全限定名组织；每节内部合并重复字符串，跨模块不按名称合并，规则见下。
 
 不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 只列基础类型；顶层控制流、编译配置和 `cutlass_dsl` 入口不展开。Task Scheduling 子模块已拆开；`cutlass.cute.experimental` 的公开子模块已单列，可选 `iket` 不展开。完整签名见 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)，源码版本见 [v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
+
+## 路径
+
+本页说的路径是导入路径：模块命名空间加符号名，例如 `cutlass.cute.experimental.cluster_mailbox.ClusterMailbox`。它对应一条 `import` 或属性访问路径。
+
+需要区分下面几种路径：
+
+| 路径类型 | 含义 |
+| --- | --- |
+| 导入路径 | 模块加符号，例如 `cutlass.cute.typing.Tensor` |
+| 源码文件路径 | 文件位置，例如 `python/CuTeDSL/cutlass/cute/typing.py` |
+| 别名路径 | 同一对象的多条导入路径，例如 `cutlass.cute.Tensor` 和 `cutlass.cute.typing.Tensor` |
+| 调用路径 | host launcher 到 kernel、再到具体指令的执行链 |
+| Python 搜索路径 | `sys.path`、`PYTHONPATH` 和包安装目录 |
+
+本页只记录导入路径。API 对象是否相同，按对象身份判断。同一个对象可以有多条导入路径；不同对象也可能共享同一个尾名。
 
 ## 去重规则
 
