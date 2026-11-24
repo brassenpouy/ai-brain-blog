@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
 date: "2026-11-24T21:28:21+08:00"
-lastmod: "2026-11-24T21:31:56+08:00"
+lastmod: "2026-11-24T21:35:03+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -17,7 +17,9 @@ slug: "cute-dsl-4-8-1-api-index"
 
 覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及有明确导出的 experimental 模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
 
-共 59 个模块或命名空间，1329 个导出项。索引按模块和完全限定名组织，不做跨模块语义去重；同名 API 可能指向同一对象，也可能是不同实现。每节内部只合并重复字符串：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，合并后 162 项。
+共 59 个模块或命名空间，1329 个导出项。索引按模块和完全限定名组织，跨模块同名项不按字符串合并。确认是同一对象的别名才可合并并备注；不能确认等价的保留为独立 API。同名 API 可能指向同一对象，也可能是不同实现。每节内部只合并重复字符串：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，合并后 162 项。
+
+已确认的重导出示例：`cutlass.cute.Tensor` 与 `cutlass.cute.typing.Tensor`，`cutlass.cute.make_layout` 与 `cutlass.cute.core.make_layout`，`cutlass.cute.nvgpu.make_tiled_tma_atom_A` 与 `cutlass.cute.nvgpu.helpers.make_tiled_tma_atom_A`。这些是同一对象的不同入口；未验证的同名项不合并。
 
 不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 一节只列基础类型；`cutlass` 顶层的控制流、编译配置和 `cutlass_dsl` 入口不在本页展开。Task Scheduling 子模块按 4.8.1 文档拆开列出。`cutlass.cute.experimental` 中未统一导出的内部子模块也不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
 
