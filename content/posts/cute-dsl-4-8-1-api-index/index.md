@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
-date: "2026-11-24T21:20:38+08:00"
-lastmod: "2026-11-24T21:26:37+08:00"
+date: "2026-11-24T21:28:21+08:00"
+lastmod: "2026-11-24T21:28:21+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -17,9 +17,9 @@ slug: "cute-dsl-4-8-1-api-index"
 
 覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及有明确导出的 experimental 模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
 
-共 50 个模块或命名空间，1259 个导出项；跨模块去重后 940 个符号。每节内部去重：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，去重后 162 项。
+共 59 个模块或命名空间，1329 个导出项；跨模块去重后 989 个符号。每节内部去重：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，去重后 162 项。
 
-不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 一节只列基础类型；`cutlass` 顶层的控制流、编译配置和 `cutlass_dsl` 入口不在本页展开。`cutlass.cute.experimental` 中未统一导出的内部子模块也不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
+不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 一节只列基础类型；`cutlass` 顶层的控制流、编译配置和 `cutlass_dsl` 入口不在本页展开。Task Scheduling 子模块按 4.8.1 文档拆开列出。`cutlass.cute.experimental` 中未统一导出的内部子模块也不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
 
 ## 符号清单
 
@@ -177,6 +177,13 @@ ceil, clamp, copysign, cos, cosh, div, erf, erfc, exp, exp2, expm1, floor
 fma, fpowi, ipowi, isfinite, isinf, isnan, isnormal, log, log10, log1p
 log2, MathOperand, max, min, mul, neg, pow, rcp, rem, round, roundeven
 RoundingMode, rsqrt, sin, sincos, sinh, sqrt, sub, tan, tanh, trunc
+```
+
+### cutlass.cute.viz（7）
+
+```text
+Band, PALETTES, print_latex, print_latex_tv, tikz_color_rainbow
+tikz_color_tv, tikz_escape
 ```
 
 ### cutlass.cute.arch（162）
@@ -595,6 +602,65 @@ wmma_mma, wmma_store
 consumer_work, domain_loop, Every, IterationPredicate, OpaqueCondition
 pipeline, producer_work, schedule, when_false, when_true, work_tile_loop
 WorkAttr
+```
+
+### cutlass.experimental.task_scheduling.enums（16）
+
+```text
+BlockGuard, Every, guard_fires, is_iteration_predicate, is_loop_guard
+is_skippable_guard, IterationPredicate, LoopGuard, OpaqueCondition
+PipelineGroupMode, PipelineType, ScheduleStage, ScheduleStageType
+SignalingThreads, TileSchedulerType, WorkAttr
+```
+
+### cutlass.experimental.task_scheduling.memory（5）
+
+```text
+ResourceContext, SmemAllocation, SmemAllocator, TmemAllocation
+TmemAllocator
+```
+
+### cutlass.experimental.task_scheduling.pipeline（3）
+
+```text
+TSPipelineAsyncUmma, TSPipelineTmaAsync, TSPipelineUmmaUmma
+```
+
+### cutlass.experimental.task_scheduling.pipeline_group（1）
+
+```text
+PipelineGroup
+```
+
+### cutlass.experimental.task_scheduling.resources（13）
+
+```text
+bind_task_local_variables, consumer_work, get_task_local_variables
+MemoryResource, PdlLaunchBarrier, PdlWaitBarrier, PipelineConfig
+producer_work, StageInfo, TaskLocalVariable, TileSchedulerConfig
+WorkQueue, WorkTileInfo
+```
+
+### cutlass.experimental.task_scheduling.schedule_builder（18）
+
+```text
+ConditionalBlock, DataFlowToken, domain_loop, DomainLoop, DomainLoopProxy
+ResourceProxy, Route, schedule, Schedule, ScheduleBuilder, ScheduleError
+ScheduleResult, Step, when_false, when_true, work_tile_loop, WorkTileLoop
+WorkTileLoopProxy
+```
+
+### cutlass.experimental.task_scheduling.task（2）
+
+```text
+normalize_and_validate_schedule_list, Task
+```
+
+### cutlass.experimental.task_scheduling.task_manager（5）
+
+```text
+DependencyGraphControlEdge, DependencyGraphEdge, expand_loop
+print_schedule_list, TaskManager
 ```
 
 ### cutlass.cute.experimental.cluster_mailbox（4）
