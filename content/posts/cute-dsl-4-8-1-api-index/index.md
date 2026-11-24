@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
-date: "2026-11-24T21:15:07+08:00"
-lastmod: "2026-11-24T21:15:18+08:00"
+date: "2026-11-24T21:20:38+08:00"
+lastmod: "2026-11-24T21:20:38+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -13,13 +13,13 @@ slug: "cute-dsl-4-8-1-api-index"
 
 ## 范围
 
-本页列 CUTLASS 4.8.1 的模块级公开导出。数据来自 `python/CuTeDSL` 源码中的 `__all__` 和 4.8.1 API 文档，保留源码中的大小写与拼写。
+本页列 CUTLASS 4.8.1 的模块级公开导出。数据取自 `python/CuTeDSL` 源码和 4.8.1 API 文档，保留源码中的大小写与拼写。
 
-包含 `cutlass`、`cutlass.cute`、`cutlass.pipeline`、`cutlass.utils` 和相关 experimental 模块。不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。
+覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及有明确导出的 experimental 模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
 
-共 44 个模块或命名空间，1200 个导出项；跨模块去重后 903 个符号。`cutlass.cute` 会重导出 `core` 和 `math` 的名字，因此清单有重复。
+共 50 个模块或命名空间，1259 个导出项；跨模块去重后 940 个符号。每节内部去重：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，去重后 162 项。
 
-完整签名和参数说明见 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
+不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass.cute.experimental` 中未统一导出的内部子模块也不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
 
 ## 符号清单
 
@@ -31,6 +31,50 @@ Float64, Float6E2M3FN, Float6E3M2FN, Float8E4M3, Float8E4M3B11FNUZ
 Float8E4M3FN, Float8E5M2, Float8E8M0FNU, Int128, Int16, Int32, Int4
 Int64, Int8, Integer, Numeric, Pointer, TFloat32, Uint128, Uint16, Uint32
 Uint64, Uint8, Vector
+```
+
+### cutlass.block（1）
+
+```text
+block_copy
+```
+
+### cutlass.runtime（5）
+
+```text
+find_runtime_libraries, load_module, make_fake_array
+make_fake_compact_array, make_fake_stream
+```
+
+### cutlass.testing（12）
+
+```text
+add_tensor_init_args, benchmark, CantImplementError, CuptiProfiler
+get_workspace_count, JitArguments, sample_pytest, should_use_normal_init
+tensor_init_config_from_args, TensorInitConfig, tune
+validate_tensor_init_args
+```
+
+### cutlass.torch（13）
+
+```text
+as_tensor, convert_cute_tensor, create_and_permute_torch_tensor
+current_stream, cute_tensor_like, default_stream, GaussianInitConfig
+get_leading_dim, matrix, prepare_tensors_for_gemm, RandomInitConfig
+ScalarInitConfig, TensorInitType
+```
+
+### cutlass.jax（21）
+
+```text
+CUTE_DSL_JAX_MIN_SUPPORTED_PYTHON_VERSION
+CUTE_DSL_MIN_SUPPORTED_JAX_VERSION, cutlass_call, cutlass_to_jax_dtype
+cutlass_to_jax_layout_order, disable_automatic_ffi_registration
+from_dlpack, get_cutlass_call_ffi_name, get_cutlass_call_ffi_version
+get_export_disabled_safety_checks, is_available, is_ffi_registered
+jax_to_cutlass_dtype, jax_to_cutlass_layout_order, JaxArray, register_ffi
+release_compile_cache, set_ffi_call_targets, TensorMode, TensorSpec
+testing
 ```
 
 ### cutlass.cute（180）
@@ -203,6 +247,13 @@ normalize_field_to_ir_name, OperandMajorMode, OutputMajorMode
 SharedSpace, StoreCacheMode
 ```
 
+### cutlass.cute.nvgpu.helpers（4）
+
+```text
+make_im2col_tma_atom_A, make_tiled_tma_atom_A, make_tiled_tma_atom_B
+make_tiled_tma_atom_C
+```
+
 ### cutlass.cute.nvgpu.cpasync（24）
 
 ```text
@@ -249,11 +300,12 @@ SmemLayoutAtomKind, St16x128bOp, St16x256bOp, St16x32bx2Op, St16x64bOp
 St32x32bOp, tile_to_mma_shape, TmemLoadRedOp, Unpack
 ```
 
-### cutlass.cute.runtime（8）
+### cutlass.cute.runtime（11）
 
 ```text
-from_dlpack, make_fake_compact_tensor, make_fake_tensor, make_ptr
-nullptr, Pointer, Tensor, TensorAdapter
+find_runtime_libraries, from_dlpack, load_module, make_fake_compact_tensor
+make_fake_stream, make_fake_tensor, make_ptr, nullptr, Pointer
+Tensor, TensorAdapter
 ```
 
 ### cutlass.cute.testing（18）
