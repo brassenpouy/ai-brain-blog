@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1：使用场景、API 分类与工程边界"
 date: "2026-11-23"
-lastmod: "2026-11-24T21:02:57+08:00"
+lastmod: "2026-11-24T21:07:23+08:00"
 description: "基于 4.8.1 文档和源码，整理 CuTe DSL 的适用场景、最小工作流、对外 API 分类，以及 GitHub issue 暴露的工程边界。"
 tags:
   - "CUTLASS"
@@ -78,6 +78,16 @@ compiled(a_t, b_t, c_t)
 ```
 
 性能由 `thr_layout`、`val_layout`、`TiledCopy`、`TiledMma` 这些对象决定，Python 语法本身不是重点。
+
+## API 在使用中起什么作用
+
+CuTe DSL 的 API 是构造 kernel 的接口，作用分三层：
+
+- 描述结构：layout、tensor、copy atom、MMA atom 把线程、值、内存和指令的映射写成可编译对象，决定正确性和性能。
+- 划分编译期和运行期：`@cute.jit` / `@cute.kernel` 里的 Python 代码在编译期生成 IR；`cute.compile` 做特化和缓存；kernel 内没有 Python 解释器。
+- 连接硬件和运行时：`arch` / `nvgpu` / `pipeline` / `memory` 暴露 barrier、TMA、`cp.async`、`tcgen05`、TMEM；runtime/FFI API 负责 DLPack、stream、JAX/TVM 和 AOT。
+
+API 的调用位置决定它何时生效：layout/atom 多数在编译期展开，host 侧 tensor 转换和 launch 发生在运行期。
 
 ## API 分类
 
