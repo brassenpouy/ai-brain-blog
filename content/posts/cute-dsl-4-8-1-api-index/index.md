@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
 date: "2026-11-24T21:41:30+08:00"
-lastmod: "2026-11-24T21:45:27+08:00"
+lastmod: "2026-11-24T21:48:03+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -17,7 +17,7 @@ slug: "cute-dsl-4-8-1-api-index"
 
 覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及 experimental 子模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
 
-共 67 个模块或命名空间，1477 个导出项。索引按模块和完全限定名组织；每节内部合并重复字符串，跨模块不按名称合并，规则见下。
+共 67 个模块或命名空间，1478 个导出项。索引按模块和完全限定名组织；每节内部合并重复字符串，跨模块不按名称合并，规则见下。
 
 不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 只列基础类型；顶层控制流、编译配置和 `cutlass_dsl` 入口不展开。Task Scheduling 子模块已拆开；`cutlass.cute.experimental` 的公开子模块已单列，可选 `iket` 不展开。完整签名见 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)，源码版本见 [v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
 
@@ -198,7 +198,7 @@ Band, PALETTES, print_latex, print_latex_tv, tikz_color_rainbow
 tikz_color_tv, tikz_escape
 ```
 
-### cutlass.cute.experimental（78）
+### cutlass.cute.experimental（79）
 
 ```text
 AccumulatorBufferingKind, AccumulatorBufferingPlan, AccumulatorDrain
@@ -207,7 +207,7 @@ AsyncToUMMAPipeline, b32_payload, B32PayloadCodec
 circular_buffer_pipeline_advance_iterator
 circular_buffer_pipeline_consume
 circular_buffer_pipeline_consumer_release, CircularBufferPipelineState
-CLCPipeline, ClusterMailbox, compile, consumer_release
+CLCPipeline, cluster_mailbox, ClusterMailbox, compile, consumer_release
 consumer_release_elect_one_sync, consumer_tail, consumer_try_wait
 consumer_wait, copy, create_circular_buffer_pipeline, create_pipeline
 create_pipeline_state_at, create_pipeline_with_mask, dot
