@@ -1,7 +1,7 @@
 ---
 title: "CuTe DSL 4.8.1 API 全量索引"
 date: "2026-11-24T21:41:30+08:00"
-lastmod: "2026-11-24T21:41:30+08:00"
+lastmod: "2026-11-24T21:45:27+08:00"
 description: "CUTLASS 4.8.1 中 cutlass 和 cutlass.cute 的模块级公开导出，按模块分组。"
 tags:
   - "CUTLASS"
@@ -13,25 +13,25 @@ slug: "cute-dsl-4-8-1-api-index"
 
 ## 范围
 
-本页列 CUTLASS 4.8.1 的模块级公开导出。数据取自 `python/CuTeDSL` 源码和 4.8.1 API 文档，保留源码中的大小写与拼写。
+本页列 CUTLASS 4.8.1 的模块级公开导出，来源是 `python/CuTeDSL` 源码和 4.8.1 API 文档。名称保留源码大小写和拼写。
 
-覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及有明确导出的 experimental 模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
+覆盖 `cutlass` 基础类型、运行时和测试模块、`cutlass.cute` 及其子模块、`cutlass.pipeline`、`cutlass.utils`、`cutlass.tensor_utils`，以及 experimental 子模块。`cutlass.torch` 和 `cutlass.jax` 作为可选适配层单列。
 
-共 67 个模块或命名空间，1477 个导出项。索引按模块和完全限定名组织；跨模块同名项不按字符串合并，规则见下。每节内部只合并重复字符串：例如 `cutlass.cute.arch` 的 `__all__` 有 167 项，合并后 162 项。
+共 67 个模块或命名空间，1477 个导出项。索引按模块和完全限定名组织；每节内部合并重复字符串，跨模块不按名称合并，规则见下。
 
-不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 一节只列基础类型；`cutlass` 顶层的控制流、编译配置和 `cutlass_dsl` 入口不在本页展开。Task Scheduling 子模块按 4.8.1 文档拆开列出。`cutlass.cute.experimental` 的公开子模块已单列；可选 `iket` 组件不展开。完整签名查 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)。源码版本：[v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
+不包含 `base_dsl`、`_mlir` 内部模块、私有 `_` 符号、类方法和参数签名。`cutlass` 只列基础类型；顶层控制流、编译配置和 `cutlass_dsl` 入口不展开。Task Scheduling 子模块已拆开；`cutlass.cute.experimental` 的公开子模块已单列，可选 `iket` 不展开。完整签名见 [CuTe DSL 4.8.1 API Reference](https://docs.nvidia.com/cutlass/4.8.1/media/docs/pythonDSL/cute_dsl_api.html)，源码版本见 [v4.8.1](https://github.com/NVIDIA/cutlass/tree/v4.8.1)。
 
 ## 去重规则
 
-本索引在列表层保留所有模块路径，只在语义统计中合并完全等价项。
+本页保留所有模块路径，语义计数只合并完全等价项。
 
-- 完全等价的判据是对象身份相同（`a is b`），并且 API 语义和签名一致。同名本身不构成依据。
-- 合并后保留一个主名称，备注其他模块路径。例如 `cutlass.cute.Tensor` 与 `cutlass.cute.typing.Tensor`，`cutlass.cute.make_layout` 与 `cutlass.cute.core.make_layout`。
-- 同名但不同实现不合并。例如 `cutlass.memory.SmemAllocator` 与 `cutlass.experimental.task_scheduling.memory.SmemAllocator`。
+- 完全等价指对象身份相同（`a is b`），API 语义和签名一致。同名不构成依据。
+- 合并后保留主名称，备注其他路径。例如 `cutlass.cute.Tensor` 与 `cutlass.cute.typing.Tensor`，`cutlass.cute.make_layout` 与 `cutlass.cute.core.make_layout`。
+- 同名不同实现不合并，例如 `cutlass.memory.SmemAllocator` 与 `cutlass.experimental.task_scheduling.memory.SmemAllocator`。
 - 未验证对象身份的同名项不合并。
-- 同一模块内重复的字符串只保留一次，例如 `cutlass.cute.arch` 的 `__all__` 从 167 项合并为 162 项。
+- 同一模块内重复字符串只保留一次，例如 `cutlass.cute.arch` 的 `__all__` 从 167 项合并为 162 项。
 
-因此页面统计的是模块导出路径数，不是语义唯一的 API 数。
+因此页面统计的是模块导出路径数，不声称语义唯一的 API 数。
 
 ## 符号清单
 
