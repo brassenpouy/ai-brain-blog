@@ -1,8 +1,8 @@
 ---
 title: "CUDA 13.3 API 兼容验收门槛"
 date: "2026-11-26T22:13:00+08:00"
-lastmod: "2026-11-26T22:13:00+08:00"
-description: "以 CUDA 13.3 Runtime/Driver API 为边界，定义 GPU 厂商软件栈的兼容验收硬门槛。"
+lastmod: "2026-11-26T22:15:58+08:00"
+description: "以 CUDA 13.3 Runtime/Driver API 为边界，定义源码级兼容验收硬门槛；不覆盖 ABI/二进制兼容。"
 tags:
   - "CUDA"
   - "兼容性"
@@ -14,28 +14,29 @@ slug: "cuda-13-3-api-compatibility-gate"
 
 ## 验收边界
 
-CUDA 13.3 API 兼容验收只回答三件事：版本和 ABI 是否对齐，声明支持的符号能否使用，行为和错误语义是否一致。
+CUDA 13.3 API 兼容验收只回答三件事：版本和 API 契约是否对齐，声明支持的符号能否使用，行为和错误语义是否一致。
 
 cuBLAS、cuDNN、NCCL、PyTorch 和模型精度不在这一层验收。API 测试通过，不能推出完整软件栈兼容。
+
+本文的兼容指源码/API 兼容：应用使用 13.3 头文件和 API，重新编译后运行。已有 CUDA 二进制不重编译直接运行、soname、符号版本、结构体布局和 driver ABI 与 NVIDIA 一致，都不在范围内。
 
 先声明范围。覆盖 13.3 全部公开 Runtime/Driver API，才可以叫“全量兼容”；只覆盖子集，只能标“部分兼容”。
 
 ## 参考环境
 
-以 CUDA 13.3 GA 为基准：驱动 610.43.02，cudart 13.3.29。CUDA 13.x 的 minor version compatibility 最低驱动要求为 580。参考环境用于差分测试，不要求厂商驱动号与 NVIDIA 相同。
+以 CUDA 13.3 GA 为基准：驱动 610.43.02，cudart 13.3.29。参考环境用于差分测试，不要求厂商驱动号与 NVIDIA 相同。
 
 13.3 的 API 变化以 [CUDA 13.3 Release Notes](https://docs.nvidia.com/cuda/archive/13.3.0/cuda-toolkit-release-notes/index.html)、[Runtime API](https://docs.nvidia.com/cuda/archive/13.3.0/cuda-runtime-api/index.html) 和 [Driver API](https://docs.nvidia.com/cuda/archive/13.3.0/cuda-driver-api/index.html) 为准。
 
 ## 四道硬门槛
 
-### 版本与 ABI
+### 版本与 API 契约
 
 - `cudaRuntimeGetVersion()` 和 `cuDriverGetVersion()` 返回 13.3 对应版本号 13030。
-- 头文件 `CUDA_VERSION` 为 13030；公共结构体大小、字段偏移、枚举值与 13.3 头文件一致。
-- 声明支持的符号全部可解析；`cuGetProcAddress` 的版本化入口可用。
-- `libcudart`、`libcuda` 的 soname、符号版本和依赖关系符合目标平台。
+- 头文件 `CUDA_VERSION` 为 13030；使用 13.3 头文件可以编译，API 参数、枚举和回调签名与 13.3 一致。
+- 声明支持的符号在编译和链接阶段可用；`cuGetProcAddress` 的版本化入口可用。
 
-### API 面
+### API 覆盖
 
 - 声明范围内的符号覆盖率 100%。
 - 不支持的能力返回文档定义的错误，不能返回成功，也不能静默降级。
@@ -78,7 +79,7 @@ P0/P1 用例通过率必须为 100%。
 
 满足以下条件，才能判定 CUDA 13.3 API 兼容验收通过：
 
-1. 声明范围内 API/ABI 覆盖率 100%。
+1. 声明范围内 API 覆盖率 100%。
 2. P0/P1 用例通过率 100%。
 3. 静默错误、崩溃、挂起、内存破坏为 0。
 4. 13.3 新增 API 全部有实现或不支持结论。
