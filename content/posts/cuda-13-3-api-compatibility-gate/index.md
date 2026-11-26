@@ -1,7 +1,7 @@
 ---
 title: "CUDA 13.3 API 兼容验收门槛"
 date: "2026-11-26T22:13:00+08:00"
-lastmod: "2026-11-26T22:17:35+08:00"
+lastmod: "2026-11-26T22:19:31+08:00"
 description: "以 CUDA 13.3 Runtime/Driver API 为边界，定义源码级兼容验收硬门槛；不覆盖 ABI/二进制兼容。"
 tags:
   - "CUDA"
@@ -52,6 +52,7 @@ cuBLAS、cuDNN、NCCL、PyTorch 和模型精度也不在这一层验收。API �
 - 异步错误：kernel launch 后的错误在哪个同步点暴露。
 - 错误模型：非法参数、越界、错误 handle、sticky error、last error 清除规则。
 - 多线程、多 stream、多卡、P2P、IPC 和 MPS/MIG。
+- PDL：测试 `cudaLaunchAttributeProgrammaticStreamSerialization`、`cudaLaunchAttributeProgrammaticEvent`、`cudaTriggerProgrammaticLaunchCompletion` 和 `cudaGridDependencySynchronize`。覆盖 successor 提前启动、trigger 条件、事件触发、无 trigger 的退化路径、stream/event 顺序，以及 Driver API 的 `CU_LAUNCH_ATTRIBUTE_PROGRAMMATIC_*` 映射。
 - PTX 和 cubin 分开测试。13.3 文档明确 PTX 在旧驱动上受限，不能混在一起判断。
 - 版本混用按 13.3 的 version mixing rules 测试，不假设任意组合都可用。
 
@@ -69,7 +70,7 @@ cuBLAS、cuDNN、NCCL、PyTorch 和模型精度也不在这一层验收。API �
 | 级别 | 范围 |
 | --- | --- |
 | P0 | 初始化、context、module、memory、stream、event、kernel launch、错误模型、版本管理 |
-| P1 | graph、VMM、async allocator、P2P/IPC、MPS/MIG、green context、PTX JIT |
+| P1 | graph、PDL、VMM、async allocator、P2P/IPC、MPS/MIG、green context、PTX JIT |
 | P2 | interop、texture/surface、profiler、checkpoint 等 |
 
 P0/P1 必须全部通过。P2 可以有不支持项，但必须记录在兼容矩阵中。
@@ -84,7 +85,7 @@ P0/P1 必须全部通过。P2 可以有不支持项，但必须记录在兼容�
 - DMA-BUF mmap：设备属性、export、`mmap` 和同步协议；不支持平台明确报错。
 - CUDA 13.3 新 API 的错误路径和资源清理。
 
-NVIDIA 13.3 release notes 中的 known issues 要映射到测试豁免，不能把已知 bug 当作兼容通过。
+NVIDIA 13.3 release notes 中的 known issues 要映射到测试豁免，不能把已知 bug 当作兼容通过。13.3 的 cuBLAS PDL known issue 也应在库层复现，确认 API 层不会把错误的依赖顺序误判为通过。
 
 ## 硬门槛
 
