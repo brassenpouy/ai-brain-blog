@@ -1,7 +1,7 @@
 ---
 title: "CUDA 13.3 API 兼容验收门槛"
 date: "2026-11-26T22:13:00+08:00"
-lastmod: "2026-11-26T22:19:31+08:00"
+lastmod: "2026-11-26T22:21:53+08:00"
 description: "以 CUDA 13.3 Runtime/Driver API 为边界，定义源码级兼容验收硬门槛；不覆盖 ABI/二进制兼容。"
 tags:
   - "CUDA"
@@ -56,6 +56,20 @@ cuBLAS、cuDNN、NCCL、PyTorch 和模型精度也不在这一层验收。API �
 - PTX 和 cubin 分开测试。13.3 文档明确 PTX 在旧驱动上受限，不能混在一起判断。
 - 版本混用按 13.3 的 version mixing rules 测试，不假设任意组合都可用。
 
+### 设备侧 API
+
+Host 侧 API 之外，device 侧接口单独建组，不要只测 launcher：
+
+- Device Runtime API（动态并行）：device 侧 malloc/free、memcpy/memset、stream/event、device synchronize、嵌套 launch。测试需启用 relocatable device code 和 `cudadevrt`。
+- PDL：`cudaGridDependencySynchronize`、`cudaTriggerProgrammaticLaunchCompletion`，覆盖依赖触发和提前 launch。
+- Cooperative Groups：block/grid/cluster sync、`memcpy_async`、reduce；cluster/DSMEM 只在支持架构上测。
+- libcu++：`cuda::atomic`、`cuda::barrier`、`cuda::pipeline`、`memcpy_async`；按版本矩阵标注支持范围。
+- Tensor Core wrapper：`nvcuda::wmma`、MMA/WGMMA/tcgen05 相关接口；按架构分档。
+- Device Graph Launch：设备侧 graph launch 和更新；不支持时明确报错。
+- 内建与 intrinsics：`threadIdx`、`blockIdx`、`__syncthreads`、`__syncwarp`、shuffle/ballot、`__ldg`、atomics、`printf`/`assert`。
+
+设备侧测试要单独看设备堆 OOM、嵌套 launch 失败、cluster 尺寸、device graph 生命周期和错误传播。它们和 Host API 的失败语义不同。
+
 ### 故障注入
 
 每个高风险用例独立进程运行，避免 sticky error 和 context 损坏污染后续测试。
@@ -70,7 +84,7 @@ cuBLAS、cuDNN、NCCL、PyTorch 和模型精度也不在这一层验收。API �
 | 级别 | 范围 |
 | --- | --- |
 | P0 | 初始化、context、module、memory、stream、event、kernel launch、错误模型、版本管理 |
-| P1 | graph、PDL、VMM、async allocator、P2P/IPC、MPS/MIG、green context、PTX JIT |
+| P1 | graph、PDL、device runtime、cooperative groups、cluster/DSMEM、VMM、async allocator、P2P/IPC、MPS/MIG、green context、PTX JIT |
 | P2 | interop、texture/surface、profiler、checkpoint 等 |
 
 P0/P1 必须全部通过。P2 可以有不支持项，但必须记录在兼容矩阵中。
