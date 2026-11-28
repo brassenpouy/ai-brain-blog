@@ -1,8 +1,8 @@
 ---
 title: "CUDA 13.3 API 兼容验收标准"
 date: "2026-11-26T22:13:00+08:00"
-lastmod: "2026-11-28T11:31:33+08:00"
-description: "以 CUDA 13.3 Runtime/Driver API 为边界，定义源码级兼容验收标准；不覆盖 ABI/二进制兼容。"
+lastmod: "2026-11-28T11:34:25+08:00"
+description: "GPU 厂商对齐 CUDA 时，以 CUDA 13.3 为例的源码级 API 兼容验收标准；不覆盖 ABI/二进制兼容。"
 tags:
   - "CUDA"
   - "兼容性"
@@ -12,15 +12,17 @@ draft: false
 slug: "cuda-13-3-api-compatibility-gate"
 ---
 
-## 验收边界
+## 背景与边界
 
-CUDA 13.3 API 兼容验收只回答三件事：版本和 API 接口是否对齐，声明支持的符号能否使用，行为和错误语义是否一致。
+不少 GPU 厂商在软件栈上对齐 NVIDIA：头文件、Runtime/Driver API、常用库和框架接口尽量保持 CUDA 形态，降低客户的迁移成本。这个策略有效，但“兼容 CUDA”经常停留在市场描述，缺少可验收的边界。
 
-本文的兼容指源码/API 兼容：应用使用 13.3 头文件和 API，重新编译后运行。已有 CUDA 二进制不重编译直接运行、soname、符号版本、结构体布局和 driver ABI 与 NVIDIA 一致，都不在范围内。
+本文以 CUDA 13.3 为例，给出一套源码级 API 兼容验收标准，把“能不能叫兼容”拆成可执行的条件。
 
-cuBLAS、cuDNN、NCCL、PyTorch 和模型精度也不在这一层验收。API 测试通过，不能推出完整软件栈兼容。
+这里只讨论源码/API 兼容：应用使用 13.3 头文件和 API，重新编译后运行。已有 CUDA 二进制不重编译直接运行、soname、符号版本、结构体布局和 driver ABI 与 NVIDIA 一致，不在范围内。
 
-先声明范围。覆盖 13.3 全部公开 Runtime/Driver API，才可以叫“全量兼容”；只覆盖子集，只能标“部分兼容”。
+cuBLAS、cuDNN、NCCL、PyTorch 和模型精度也不在这一层验收。API 通过，不等于软件栈兼容。
+
+兼容范围按声明处理：覆盖 13.3 全部公开 Runtime/Driver API，才可以叫“全量兼容”；只覆盖子集，只能标“部分兼容”。
 
 ## 13.3 基准
 
