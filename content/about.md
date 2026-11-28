@@ -14,4 +14,4 @@ comments: false
 
 ## 联系方式
 
-邮箱：[chad.zha0604@gmail.com](mailto:chad.zha0604@gmail.com)
+暂不公开邮箱。
